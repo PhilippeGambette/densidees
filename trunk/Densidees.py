@@ -1,6 +1,6 @@
 #!/usr/sfw/bin/python
 # -*- coding: iso-8859-15 -*-
-#"C:\Python26\Python.exe" C:\These\2009Densidees\Densidees.py C:\These\2009Densidees\Test.txt
+#C:\Python26\Python.exe C:\These\2009Densidees\densidees\Densidees.py C:\These\2009Densidees\densidees\Test.txt
 
 #####################################################
 # Copyright 2009 Philippe Gambette
@@ -53,19 +53,27 @@ parameter=int(args["parameter"]);
 
 def isPropTag(tag):
         result=0
-        if tag=="KON" or tag=="NUM" or tag=="ADJ":
-                result=1
-        if re.search("^VER.*",tag):
+        if tag=="KON" or tag=="NUM":
                 result=1
         if re.search("^DET.*",tag):
                 result=1        
         if re.search("^PRP.*",tag):
                 result=1        
+        if tag=="ADJ" or tag=="PRO:POS" or tag=="PRO:IND" or tag=="ADV":
+                result=1
+        if re.search("^VER.*",tag):
+                result=1
         if tag=="PRO:REL":
                 result=1
-        
         return result
 
+def isLink(lemma):
+        result=0
+        if re.search("^|être.*",lemma):
+                result=1
+        if lemma=="sembler" or lemma=="devenir":
+                result=1
+        return result
 
 if os.path.isfile(thefile):
         print "Chargement du fichier texte..."
@@ -109,6 +117,25 @@ if os.path.isfile(thefile):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="201"
 
+                # 301
+                # Linking verb is not a proposition if followed by adj. or adv.
+                if (text[i]["tag"]=="ADJ" or text[i]["tag"]=="ADV") and isLink(text[i-1]["lemma"]):
+                        text[i-1]["isProp"]=" "
+                        text[i-1]["rule"]="301"
+
+                # 302
+                # "Be" is not a proposition when followed by a preposition.
+                # (May want to modify this to allow an intervening adverb.)
+                if text[i]["tag"]=="PRP" and re.search("^.*être.*",text[i-1]["lemma"]):
+                        text[i-1]["isProp"]=" "
+                        text[i-1]["rule"]="302"
+
+                # 402
+                # Aux Verb is one proposition, not two
+                if re.search("^VER.*",text[i]["tag"]) and re.search("^VER:aux.*",text[i-1]["tag"]):
+                        text[i-1]["isProp"]=" "
+                        text[i-1]["rule"]="402"
+
                 i+=1
 
         # Display information about the words
@@ -130,7 +157,7 @@ if os.path.isfile(thefile):
         # Display final information
         print nbWords,"mots."
         print nbProps,"propositions."
-        print "Densité d'idées :",((nbProps+0.00000001)/(nbWords+0.00000001))
+        print "Densite d'idees :",round((nbProps+0.00000001)/(nbWords+0.00000001),4)
 else:
         if re.search("help",thefile):
                 print ""
