@@ -1,7 +1,7 @@
 Les	DET:ART	le
 auteurs	NOM	auteur
 de	PRP	de
-CPIDR	NOM	<unknown>
+Densidées	NOM	<unknown>
 vous	PRO:PER	vous
 remercient	VER:pres	remercier
 pour	PRP	pour

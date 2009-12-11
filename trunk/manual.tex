@@ -1,0 +1,414 @@
+%http://www.akxl.net/labs/articles/creating-a-tag-cloud/
+%http://www.akxl.net/labs/articles/creating-a-tag-cloud---a-better-approach/
+%\listfiles
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage[T1]{fontenc}
+%\usepackage[latin1]{inputenc}
+\usepackage[francais]{babel}
+
+%\usepackage{epsfig}
+\usepackage{amssymb}
+\usepackage{tocvsec2}
+%\usepackage{a4}
+\usepackage{fancyhdr}
+\usepackage{subfigure}
+\usepackage{ifthen}
+\usepackage{version}
+\usepackage{tocbibind}
+\usepackage{makeidx}
+%\usepackage{times}
+\usepackage{booktabs}
+\usepackage[colorlinks=true, pdfstartview=FitV, linkcolor=blue, 
+            citecolor=blue, urlcolor=blue]{hyperref}
+\usepackage{url}
+\raggedbottom
+\sloppy
+
+\parindent=0pt
+\parskip=5pt
+
+\def\Densidees{{\sf Densidees}}
+
+%\newcommand\expert[1]{#1}   % expert mode on
+\newcommand\expert[1]{}    % expert mode off
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input manualversioninfo.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{\textbf{Manuel d'utilisateur de \Densidees}
+\begin{center}
+\includegraphics[scale=1]{Densidees.png}
+\end{center}
+version \VERSION ~- \dateversion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\author{Philippe Gambette, Hye-Ran Lee}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\makeindex
+
+\input manualdefinitions.tex
+
+\ifx\pdfoutput\undefined
+\usepackage[dvips]{graphicx}
+\else
+\usepackage[pdftex]{graphicx}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitle
+
+~\\
+~\\
+
+\settocdepth{section}
+\tableofcontents
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mysection{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NoAutoSpaceBeforeFDP
+\Densidees ~calcule la densité des idées d'un texte
+(au sens de \cite{Kintsch1974} et \cite{TurnerGreene1977}).
+Il adapte à la langue française le calcul implémenté
+pour la langue anglaise dans le logiciel CPIDR~\cite{BSKHC2008}.
+
+\Densidees ~est un logiciel libre sous licence GPL. Toutefois,
+si vous l'utilisez, nous vous invitons à citer l'article
+qui lui est consacré \cite{LeeGambette2009}.
+
+En cas de problème d'utilisation de \Densidees , vous pouvez
+envoyer votre question à \texttt{gambette@lirmm.fr}, accompagnée
+si possible d'une capture d'écran du résultat de la ligne de
+commande (son utilisation est détaillée en section~\ref{lignecommande}).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mysection{Installation du programme}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Densidees est écrit en Python (version 2.6), il faut donc
+commencer par télécharger Python sur
+\url{http://www.python.org/download/releases/2.6/}
+et l'installer (par exemple sous Windows dans \texttt{C:\textbackslash Python26}).
+Sous Windows Vista, pour réussir l'installation, il ne
+faut pas laisser la case cochée par défaut "Install for all users",
+mais choisir d'installer seulement pour son compte d'utilisateur.
+
+Ensuite, téléchargez \Densidees ~sous forme d'un fichier zip
+à l'adresse \url{http://code.google.com/p/densidees/}.
+Décompressez-le, par exemple dans le dossier \texttt{C:\textbackslash Densidees}.
+
+Ce dossier contiendra alors en particulier :
+\begin{itemize}
+\item \texttt{Densidees.exe}, une interface graphique pour Windows
+qui permet de lancer le programme sur le
+texte voulu et de cliquer pour obtenir le résultat,
+\item \texttt{Densidees.py}, le code source du programme
+en Python, que vous pouvez lancer directement depuis la ligne
+de commande, et appeler automatiquement dans des scripts pour
+calculer la densité des idées d'un ensemble de plusieurs fichiers.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mysection{Utilisation du programme}
+
+\subsection{Avec l'interface graphique sous Windows}
+
+La première étape est d'étiqueter le texte avec TreeTagger.
+Pour des textes de moins de 1000 mots, ceci est possible
+par exemple avec l'interface web disponible à l'adresse
+\url{http://www.cele.nottingham.ac.uk/~ccztk/treetagger.php}.
+
+Quand vous double-cliquez sur le programme \texttt{Densidees.exe},
+la fenêtre montrée en figure ~\ref{FigGUI} apparaît.
+Après avoir collé le texte étiqueté par TreeTagger dans le cadre
+de gauche (ou bien ouvert un fichier TXT contenant un
+texte étiqueté par TreeTagger à l'aide du bouton \emph{Ouvrir le texte}),
+il suffit de cliquer sur le bouton \emph{Calculer !}
+pour voir apparaître le résultat dans le cadre de droite.
+De plus, le résultat s'enregistre dans un fichier portant le
+même nom que le fichier ouvert dans \Densidees, suivi de l'extension
+"\texttt{.di.txt}".
+\begin{figure}[ht] % b floats figure to bottom, p floats to next page, h = here
+\begin{center}
+\includegraphics[width=1.0\textwidth]{manualDensideesGUI.png}
+\end{center}
+\caption{\small \sffamily Interface graphique de \Densidees ~sous Windows.
+}
+\label{FigGUI}
+\end{figure}
+
+Si rien ne s'affiche dans le cadre de droite au bout de 10 secondes,
+vous pouvez faire s'afficher les éventuels messages d'erreur en utilisant
+la ligne de commande comme indiqué ci-dessous. La commande à
+utiliser est en fait donnée par l'interface graphique de \Densidees ,
+au bas de la fenêtre, et vous pouvez la sélectionner, la copier,
+puis la coller dans la ligne de commande. Par exemple dans la figure~\ref{FigGUI}
+il s'agit de :\\
+\texttt{"C:\textbackslash Python26\textbackslash Python.exe" "C:\textbackslash These\textbackslash densidees\textbackslash Densidees\textbackslash Densidees.py" "C:\textbackslash These\textbackslash densidees\textbackslash  Densidees\textbackslash Test.txt"}.
+
+\subsection{Directement depuis la ligne de commande Windows}\label{lignecommande}
+
+Commencez par ouvrir une fenêtre de ligne de commande en allant dans
+le \emph{menu Démarrer}, \emph{Exécuter}, en tapant alors \texttt{cmd} puis en appuyant
+sur \emph{Entrée}.
+
+Il faut alors taper une ligne de commande de ce type :
+\texttt{"C:\textbackslash Python26\textbackslash Python.exe" "C:\textbackslash Densidees\textbackslash Densidees.py" "C:\textbackslash Densidees\textbackslash Texte1.txt"}
+
+Cette commande signifie qu'on va appeler le logiciel \texttt{Python.exe} pour lui demander de lancer le programme \texttt{Densidees.py} sur le fichier texte \texttt{Texte1.txt} qui contient le résultat de l'étiquetage TreeTagger d'un texte en français.
+
+Vous pouvez utiliser l'option \texttt{oral=1} pour utiliser le calcul de densité
+des idées en mode oral (traitement des répétitions). Par exemple, la figure~\ref{FigCMD}
+montre le résultat de l'utilisation du programme en ligne de commande, avec
+activation du mode oral.
+\begin{figure}[ht] % b floats figure to bottom, p floats to next page, h = here
+\begin{center}
+\includegraphics[width=1.0\textwidth]{manualDensideesCMD.png}
+\end{center}
+\caption{\small \sffamily Utilisation de \Densidees ~en ligne de commande sous Windows.
+}
+\label{FigCMD}
+\end{figure}
+
+\subsection{Règles appliquées}
+
+Les règles suivantes sont appliquées pour étiqueter les éléments
+du texte étiqueté par TreeTagger en mots et propositions.
+
+\begin{itemize}
+\item \textbf{002 Ponctuation et symboles :}\\
+ Signe de ponctuation, symbole => pas mot
+\item \textbf{020 Répétition ou correction d'un mot (mode oral) :}\\
+ A A ou préfixe-de-A A => premier A : pas mot, pas proposition
+\item \textbf{023 Répétition ou correction de 2 mots (mode oral) :}\\
+ A B A B ou préfixe-de-A préfixe-de-B A B => premier A et premier B : pas mot, pas proposition
+\item \textbf{024 Répétition ou correction de 3 mots (mode oral) :}\\
+ A B C A B C ou préfixe-de-A préfixe-de-B préfixe-de-C A B C => premier A, premier B et premier C : pas mot, pas proposition
+\item \textbf{200 Etiquetage basique des propositions :}\\
+ Les tags correspondant à des propositions sont marqués comme propositions\\
+ KON, NUM, DET*, PRP*, ADJ, PRO:POS, PRO:IND, ADV, VER*, PRO:REL
+\item \textbf{054 Déterminants démonstratifs (étiquetés pronoms démonstratifs) comptés comme proposition :}\\
+ "cet", "cette", "ces" -> comptés comme proposition\\
+ "ça" pas compté comme proposition
+\item \textbf{201 Déterminants non propositions :}\\
+ lemme = "un" ou "le" ou "du" => pas proposition\\
+ Attention à "du" = "de le", voir règle 202
+\item \textbf{202 Complément du nom introduit par "du" :}\\
+ NOM du NOM => "du" est une proposition
+\item \textbf{203 Soit soit :}\\
+ soit + 1 à 3 mots + soit : seul le premier "soit" est compré comme proposition
+\item \textbf{204 Conjonctions "ou" ou "et" superflues avant adverbe :}\\
+ adverbes après "et" : "puis", "alors", "donc", "ensuite", "finalement" => "et" pas proposition\\
+ adverbes après "ou" : "alors" "bien" => "ou" pas proposition
+\item \textbf{206 "de" non proposition :}\\
+"de" n'est pas proposition après "falloir", "agir", "arriver", "paraître"
+\item \textbf{207 "que" non proposition :}\\
+"que" n'est pas proposition après "falloir", "sembler", "arriver", "paraître"
+\item \textbf{210 Oui et non (mode oral) :}\\
+oui et non : pas proposition
+\item \textbf{211 Négation :}\\
+ "pas" "plus" "guère" "point" "aucun" "aucune" "jamais" "rien" précédé (à distance 1, 2 ou 3) par "ne" : seul "ne" proposition
+\item \textbf{212 Négation suivie de "de" :}\\
+ "de" n'est pas une proposition si précédée par négation
+\item \textbf{213 Futur proche :}\\
+ lemme="aller" + infinitif = futur proche : aller n'est pas une proposition
+\item \textbf{214 Si ... alors :}\\
+ "si" + 1 à 9 mots + "alors" : ne pas compter "alors" comme proposition, seulement "si".
+\item \textbf{301 Verbes de liaison :}\\
+ Verbe de liaison pas proposition si suivi d'un adjectif ou d'un adverbe
+\item \textbf{302 Verbe être suivi d'une préposition :}\\
+ "être" non proposition si suivi d'une préposition
+\item \textbf{402 Auxiliaire :}\\
+ AUX + VERBE => une seule proposition
+\item \textbf{405 Auxiliaire avec mot interposé :}\\
+ AUX + mot + VERBE => une seule proposition
+\item \textbf{500 Passif :}\\
+ participe passé + "par" => "par" non proposition
+\item \textbf{512 Verbes suivis d'une préposition naturelle :}\\
+ "à" non prop si précédé de aller, voyager\\
+ "de" non prop si précédé de venir
+\item \textbf{600 Marqueurs discursifs (mode oral) :}\\
+ expressions qui ne sont pas proposition
+\item \textbf{601 Marqueur discursif avec "bien" (mode oral) :}\\
+ "bien" n'est alors pas proposition
+\item \textbf{602 Marqueur discursif avec "donc" (mode oral) :}\\
+ "donc" n'est alors pas proposition
+\item \textbf{701 Mots composés}\\
+ "donc" n'est alors pas proposition
+\end{itemize}
+
+En mode oral, tout ce qui se trouve entre parenthèses n'est pas
+compté comme proposition. Le comptage des mots est en revanche
+effectué également à l'intérieur des parenthèses. Les parenthèses
+serviront donc à entourer des phrases incomplètes qui ne correspondent
+à aucune idée.
+
+\subsection{Correspondances entre règles CPIDR et règles \Densidees}
+
+\small
+\begin{tabular}{|c|c|l|}
+\hline
+CPIDR & \Densidees & Commentaire\\
+\hline
+000 & & \\ 
+001 & & \\ 
+002 & 002 & \\ 
+003 & & Succession de deux entiers regroupés en 1 : gérée par TreeTagger et Cordial\\
+004 & & Fractions, pourcentages : gérés par TreeTagger et Cordial\\
+020 & 020 & \\ 
+021 & & \\ 
+022 & & \\ 
+023 & 023 & \\ 
+050 & & \\ 
+054 & 054 & \\ 
+101 & & Inversion\\ 
+200 & 200 & \\ 
+201 & 201 & \\ 
+202 & 202 & Désactivée dans CPIDR\\ 
+203 & 203 & \\ 
+204 & 204 & \\ 
+206 & & \\ 
+207 & & \\ 
+210 & & \\ 
+211 & & \\ 
+212 & 211, 212 & \\ 
+213 & 213 & \\ 
+214 & 214 & \\ 
+225 & & \\ 
+230 & & \\ 
+301 & 301 & \\ 
+302 & 302 & \\ 
+310 & & \\ 
+311 & & \\ 
+401 & & \\ 
+402 & 402 & \\ 
+405 & 405 & \\ 
+510 & & \\ 
+511 & & \\ 
+512 & 512 & Désactivée dans CPIDR\\ 
+610 & & \\ 
+632 & & \\ 
+634 & 600, 601, 602, 701 & \\ 
+\hline
+\end{tabular}
+\normalsize
+
+\subsection{Modification du code source}
+
+Vous pouvez modifier le code du programme Python,
+pour supprimer des règles, en ajouter ou en modifier.
+
+Le principe est d'ouvrir le fichier \texttt{Densidees.py} dans
+un éditeur de texte adapté (par exemple Notepad2).
+
+Les règles apparaissent alors au milieu du fichier.
+\texttt{text[i]} concerne le $i$-ième élément du texte,
+et contient plusieurs informations :
+\begin{itemize}
+\item \texttt{text[i]["word"]} : la forme graphique de cet élément dans le texte.
+\item \texttt{text[i]["tag"]} : l'étiquette donnée par TreeTagger à l'élément.
+\item \texttt{text[i]["lemma"]} : le lemme de l'élément, d'après la lemmatisation de TreeTagger.
+\item \texttt{text[i]["rule"]} : contient le numéro de la dernière règle appliquée
+pour déterminer si le mot est une proposition.
+\item \texttt{text[i]["isProp"]} : contient "P" si l'élément est une proposition, "~" sinon.
+\item \texttt{text[i]["isWord"]} : contient "W" si l'élément est un mot, "~" sinon.
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mysection{Licence}\label{license}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Citation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bien que \Densidees ~soit un logiciel libre sous licence GPL,
+nous aimerions que vous fassiez référence à l'article suivant
+si vous l'utilisez dans une publication :
+Hye Ran Lee \& Philippe Gambette. Utilisation de l'analyse
+textuelle automatique dans la recherche sur la maladie d'Alzheimer.
+Soumis au Colloque international des jeunes chercheurs
+en Didactique des Langues et en Linguistique (CEDIL 2010) \cite{LeeGambette2009}.
+%\Densidees is a collection of Python scripts which creates
+%the tree cloud visualization of a text, with a large choice of parameters.
+
+%It requires the program SplitsTree, freely available from
+%\href{http://www.splitstree.org}
+%{www.splitstree.org}, to compute the tree and draw the tree clouds.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Licence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Densidees v.\VERSION ~- \dateversion\\
+\url{http://code.google.com/p/densidees/}
+
+~\\
+Copyright 2009 Philippe Gambette, Hye-Ran Lee\\
+~\\
+Densidees is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+~\\
+Densidees is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+~\\
+You should have received a copy of the GNU General Public License
+along with Densidees.  If not, see \url{http://www.gnu.org/licenses/}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mysection{Historique des versions}\label{history}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+2009/12/12 1.1 :
+\begin{itemize}
+\item interface graphique
+\item mode oral
+\item 27 règles 002, 020, 023, 024, 200, 054, 201, 202, 203, 204, 206, 207, 210, 211, 212, 213, 214, 301, 302, 402, 405, 500, 512, 600, 601, 602, 701
+\item affichage final du nombre de chacune des règles utilisées
+\end{itemize}
+
+2009/11/21 1.0 :
+\begin{itemize}
+\item 7 règles 002, 003, 200, 201, 301, 302, 402
+\item texte étiqueté par TreeTagger en entrée du programme
+\end{itemize}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mysection{Remerciements}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nous remercions le LIRMM et l'association Contact, partenaires de la journée
+Osidmesh\footnote{~\url{http://www.lirmm.fr/~semindoc/Osidmesh.html}}
+à l'origine de la collaboration qui a débouché sur la conception de ce logiciel.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\printindex
+
+\bibliographystyle{plain}
+\bibliography{manualbibliography}
+
+
+
+\end{document}
