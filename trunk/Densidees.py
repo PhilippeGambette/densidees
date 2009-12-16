@@ -150,6 +150,7 @@ def isLink(lemma):
         if lemma=="suivre|être" or lemma=="être" or lemma=="sembler" or lemma=="devenir" or lemma=="paraître" or lemma=="rester" or lemma=="demeurer":
                 result=True
         return result
+# verbe d'état CHECK 
 
 if os.path.isfile(thefile):
         print "Chargement du fichier texte..."
