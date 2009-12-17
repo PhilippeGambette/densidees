@@ -147,10 +147,9 @@ def isCordialPropTag(tag):
 
 def isLink(lemma):
         result=False
-        if lemma=="suivre|être" or lemma=="être" or lemma=="sembler" or lemma=="devenir" or lemma=="paraître" or lemma=="rester" or lemma=="demeurer":
+        if lemma=="apparaître" or lemma=="suivre|être" or lemma=="être" or lemma=="sembler" or lemma=="devenir" or lemma=="paraître" or lemma=="rester" or lemma=="demeurer" or lemma=="faire":
                 result=True
         return result
-# verbe d'état CHECK 
 
 if os.path.isfile(thefile):
         print "Chargement du fichier texte..."
@@ -300,9 +299,18 @@ if os.path.isfile(thefile):
 
                 # 206 "de" non proposition
                 # "de" n'est pas proposition après "falloir", "agir", "arriver", "paraître"
-                if text[i]["word"]=="de" and (text[i-1]["lemma"]=="falloir" or text[i-1]["lemma"]=="agir" or text[i-1]["lemma"]=="arriver" or text[i-1]["lemma"]=="paraître"):
+                if text[i]["word"]=="de" and (text[i-1]["lemma"]=="agir" or text[i-1]["lemma"]=="arriver" or text[i-1]["lemma"]=="falloir" or text[i-1]["lemma"]=="paraître"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="206"
+                if text[i]["word"]=="de" and (text[i-1]["word"]=="envie" or text[i-1]["word"]=="lieu" or text[i-1]["word"]=="peur"  or text[i-1]["word"]=="pitié" or text[i-1]["word"]=="soin") and text[i-2]["lemma"]=="avoir":
+                        text[i]["isProp"]=" "
+                        text[i]["rule"]="206"
+                if text[i-2]["word"]=="à" and (text[i-1]["word"]=="côté" and text[i]["word"]=="de"): 
+                        text[i]["isProp"]=" "
+                        text[i]["rule"]="206"
+                if text[i-2]["word"]=="en" and (text[i-1]["word"]=="face" and text[i]["word"]=="de"): 
+                        text[i]["isProp"]=" "
+                        text[i]["rule"]="206"    
 
 
                 # 207 "que" non proposition
@@ -353,7 +361,14 @@ if os.path.isfile(thefile):
                 if (tagger=="treetagger" and ((text[i]["tag"]=="ADJ" or text[i]["tag"]=="ADV") and isLink(text[i-1]["lemma"]))) or (tagger=="cordial" and ((text[i]["tag"][0]=="A" or text[i]["tag"][0]=="R") and isLink(text[i-1]["lemma"]))):
                         text[i-1]["isProp"]=" "
                         text[i-1]["rule"]="301"
-                        
+                if (text[i-2]["lemma"]=="avoir" and text[i]["lemma"]=="le" and text[i]["lemma"]=="air"):
+                        text[i]["isProp"]=" "
+                        text[i-1]["isProp"]=" "
+                        text[i-2]["isProp"]=" "
+                        text[i]["rule"]="301"
+                        text[i-1]["rule"]="301"
+                        text[i-2]["rule"]="301"
+                                        
 
                 # 302 Verbe être suivi d'une préposition
                 # "être" non proposition si suivi d'une préposition
@@ -391,10 +406,10 @@ if os.path.isfile(thefile):
                 # 512 Verbes suivis d'une préposition naturelle
                 # "à" non prop si précédé de aller, voyager ... CHECK corpus
                 # "de" non prop si précédé de venir
-                if (tagger=="treetagger" and (text[i-1]["lemma"]=="aller" or text[i-1]["lemma"]=="sortir" or text[i-1]["lemma"]=="rentrer" or text[i-1]["lemma"]=="entrer" or text[i-1]["lemma"]=="rendre")):
+                if (tagger=="treetagger" and (text[i-1]["lemma"]=="aller" or text[i-1]["lemma"]=="sortir" or text[i-1]["lemma"]=="rentrer" or text[i-1]["lemma"]=="entrer" or text[i-1]["lemma"]=="rendre") and text[i]["word"]=="à"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="512"
-                if (tagger=="treetagger" and (text[i-1]["lemma"]=="venir" or text[i-1]["lemma"]=="arriver" or text[i-1]["lemma"]=="rentrer" or text[i-1]["lemma"]=="entrer")):
+                if (tagger=="treetagger" and (text[i-1]["lemma"]=="arriver" or text[i-1]["lemma"]=="entrer" or text[i-1]["lemma"]=="rentrer" or text[i-1]["lemma"]=="revenir" or text[i-1]["lemma"]=="venir") and text[i]["word"]=="de"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="512"
 
@@ -452,9 +467,6 @@ if os.path.isfile(thefile):
                 if text[i-1]["word"]=="tout" and (text[i]["word"]=="à" or text[i]["word"]=="de"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="701"
-                if text[i-1]["word"]=="par" and (text[i]["word"]=="ailleurs"or text[i]["word"]=="conséquent" or text[i]["word"]=="bonheur" or text[i]["word"]=="malheur" or text[i]["word"]=="contre"):
-                        text[i]["isProp"]=" "
-                        text[i]["rule"]="701"
                 if text[i-2]["word"]=="tout" and (text[i-1]["word"]=="de" and text[i]["word"]=="même"):
                         text[i-1]["isProp"]=" "
                         text[i-1]["rule"]="701" 
@@ -463,12 +475,30 @@ if os.path.isfile(thefile):
                 if text[i-1]["word"]=="parce" and (text[i]["word"]=="que" and text[i]["tag"]=="KON"): 
                         text[i]["isProp"]=" "
                         text[i]["rule"]="701"
-                if text[i-2]["word"]=="à" and (text[i-1]["word"]=="côté" and text[i]["word"]=="de"): 
-                        text[i]["isProp"]=" "
-                        text[i]["rule"]="701"
-                if text[i-2]["word"]=="en" and (text[i-1]["word"]=="face" and text[i]["word"]=="de"): 
-                        text[i]["isProp"]=" "
-                        text[i]["rule"]="701"    
+                
+                # 702 Mots composés avec "par"
+                # expressions qui ne correspondent qu'à une seule proposition
+                if text[i-1]["word"]=="par" and (text[i]["word"]=="ailleurs" or text[i]["word"]=="après" or text[i]["word"]=="avance" or text[i]["word"]=="bonheur" or text[i]["word"]=="chance" or text[i]["word"]=="conséquent" or text[i]["word"]=="contre" or text[i]["word"]=="ici" or text[i]["word"]=="malheur" or text[i]["word"]=="suite"):
+                        text[i-1]["isProp"]=" "
+                        text[i]["isProp"]="P"
+                        text[i]["rule"]="702"
+                if (text[i-1]["word"]=="de" and text[i]["word"]=="par"):
+                        text[i-1]["isProp"]=" "
+                        text[i]["isProp"]="P"
+                        text[i]["rule"]="702"
+                if (text[i-2]["word"]=="par" and text[i-1]["word"]=="rapport" and text[i]["word"]=="à"):
+                        text[i-2]["isProp"]=" "
+                        text[i-1]["isProp"]=" "
+                        text[i]["isProp"]="P"
+                        text[i]["rule"]="702"
+
+                # 703 Mots composés avec "avoir"
+                # expressions qui ne correspondent qu'à une seule proposition
+                if text[i-2]["lemma"]=="en" and text[i-1]["lemma"]=="avoir" and (text[i]["word"]=="après" or text[i]["word"]=="contre"):
+                        text[i-2]["isProp"]=" "
+                        text[i-1]["isProp"]=" "
+                        text[i]["isProp"]="P"
+                        text[i]["rule"]="703"
                         
                 
                 if oral==1 and mode=="noprop":
