@@ -172,12 +172,18 @@ if os.path.isfile(thefile):
                         mode="noprop"
                 if text[i]["word"]==")":
                         mode="normal"
-                                
+                # 001 Interjections (mode oral)
+                # Interjections non reconnues par TreeTagger => pas mot, pas proposition
+                if (oral==1 and tagger=="treetagger" and (text[i]["word"]=="tiens" or text[i]["word"]=="heu")):
+                        text[i]["tag"]="INT"
+                        text[i]["rule"]="002"                        
+                if (tagger=="treetagger" and text[i]["tag"]=="ADV" and text[i]["word"]=="ben"):
+                        text[i]["tag"]="INT"
+                        text[i]["rule"]="002"
+                
                 # 002 Ponctuation et symboles (mode oral)
                 # Signe de ponctuation, symbole => pas mot
                 #if re.search("^[a-zA-Zéèçàùêîôûäëïöü0-9]",text[i]["word"]) and text[i]["tag"]!="SYM":
-                if (tagger=="treetagger" and text[i]["tag"]=="ADV" and text[i]["word"]=="ben"):
-                        text[i]["tag"]="INT"
                 if (tagger=="treetagger" and (text[i]["tag"]!="SYM" and text[i]["tag"]!="PUN" and text[i]["tag"]!="SENT" and text[i]["tag"]!="INT")) or (tagger=="cordial" and (text[i]["tag"][0]!="Y")):
                         text[i]["isWord"]="W"
                         text[i]["rule"]="002"
@@ -311,19 +317,22 @@ if os.path.isfile(thefile):
 
                 # 206 "de" non proposition
                 # "de" n'est pas proposition après "falloir", "agir", "arriver", "paraître"
-                if text[i]["word"]=="de" and (text[i-1]["lemma"]=="agir" or text[i-1]["lemma"]=="arriver" or text[i-1]["lemma"]=="falloir" or text[i-1]["lemma"]=="paraître"):
+                if text[i]["lemma"]=="de" and (text[i-1]["lemma"]=="agir" or text[i-1]["lemma"]=="arriver" or text[i-1]["lemma"]=="falloir" or text[i-1]["lemma"]=="paraître"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="206"
-                if text[i]["word"]=="de" and (text[i-1]["word"]=="envie" or text[i-1]["word"]=="lieu" or text[i-1]["word"]=="peur"  or text[i-1]["word"]=="pitié" or text[i-1]["word"]=="soin") and text[i-2]["lemma"]=="avoir":
+                if text[i]["lemma"]=="de" and (text[i-1]["word"]=="envie" or text[i-1]["word"]=="lieu" or text[i-1]["word"]=="peur"  or text[i-1]["word"]=="pitié" or text[i-1]["word"]=="soin") and text[i-2]["lemma"]=="avoir":
                         text[i]["isProp"]=" "
                         text[i]["rule"]="206"
                 if text[i]["lemma"]=="de" and (text[i-1]["lemma"]=="près" or text[i-1]["lemma"]=="auprès"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="206"
-                if text[i-2]["word"]=="à" and (text[i-1]["word"]=="côté" and text[i]["word"]=="de"): 
+                if text[i]["lemma"]=="de" and (text[i-1]["lemma"]=="beaucoup" or text[i-1]["lemma"]=="plein" or text[i-1]["lemma"]=="énormément"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="206"
-                if text[i-2]["word"]=="en" and (text[i-1]["word"]=="face" and text[i]["word"]=="de"): 
+                if text[i-2]["word"]=="à" and (text[i-1]["word"]=="côté" and text[i]["lemma"]=="de"): 
+                        text[i]["isProp"]=" "
+                        text[i]["rule"]="206"
+                if text[i-2]["word"]=="en" and (text[i-1]["word"]=="face" and text[i]["lemma"]=="de"): 
                         text[i]["isProp"]=" "
                         text[i]["rule"]="206"    
 
@@ -413,9 +422,23 @@ if os.path.isfile(thefile):
 
                 # 500 Passif
                 # participe passé + "par" => "par" non proposition
-                if text[i-1]["tag"]=="VER:pper" and text[i]["word"]=="par":
+                if (tagger=="treetagger" and (text[i-1]["tag"]=="VER:pper" and text[i]["word"]=="par")):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="500"
+                
+
+                # 509 "à" + infinitif
+                # "à" + infinitif => "à" non proposition
+                if (tagger=="treetagger" and (text[i]["tag"]=="VER:infi" and text[i-1]["word"]=="à")):
+                        text[i-1]["isProp"]=" "
+                        text[i-1]["rule"]="509"
+                        
+                        
+                # 510 Gérondif
+                # "en" + "participe présent" => "en" non proposition
+                if (tagger=="treetagger" and (text[i]["tag"]=="VER:ppre" and text[i-1]["word"]=="en")):
+                        text[i-1]["isProp"]=" "
+                        text[i-1]["rule"]="510"
                 
 
                 # 512 Verbes suivis d'une préposition naturelle
@@ -424,9 +447,10 @@ if os.path.isfile(thefile):
                 if (tagger=="treetagger" and (text[i-1]["lemma"]=="aller" or text[i-1]["lemma"]=="sortir" or text[i-1]["lemma"]=="rentrer" or text[i-1]["lemma"]=="entrer" or text[i-1]["lemma"]=="rendre") and (text[i]["word"]=="à" or text[i]["word"]=="au")):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="512"
-                if (tagger=="treetagger" and (text[i-1]["lemma"]=="arriver" or text[i-1]["lemma"]=="entrer" or text[i-1]["lemma"]=="rentrer" or text[i-1]["lemma"]=="revenir" or text[i-1]["lemma"]=="venir") and text[i]["word"]=="de"):
+                if (tagger=="treetagger" and (text[i-1]["lemma"]=="arriver" or text[i-1]["lemma"]=="entrer" or text[i-1]["lemma"]=="rentrer" or text[i-1]["lemma"]=="revenir" or text[i-1]["lemma"]=="venir") and text[i]["lemma"]=="de"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="512"
+                        
 
                 # 600 Marqueurs discursifs
                 # expressions qui ne sont pas proposition
@@ -449,6 +473,7 @@ if os.path.isfile(thefile):
                         text[i-1]["rule"]="600"
                         text[i]["isProp"]=" "
                         text[i]["rule"]="600"
+                        
                         
                 # 601 bien comme marqueur discursif
                 # "bien" n'est alors pas proposition
@@ -482,18 +507,23 @@ if os.path.isfile(thefile):
                 if text[i-1]["word"]=="tout" and (text[i]["word"]=="à" or text[i]["word"]=="de"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="701"
+                if text[i-1]["word"]=="quand" and (text[i]["word"]=="-même"):
+                        text[i]["isProp"]=" "
+                        text[i]["rule"]="701"
                 if text[i-2]["word"]=="tout" and (text[i-1]["word"]=="de" and text[i]["word"]=="même"):
                         text[i-1]["isProp"]=" "
                         text[i-1]["rule"]="701" 
                         text[i]["isProp"]=" "
                         text[i]["rule"]="701" 
-                if (text[i-1]["word"]=="alors" or text[i-1]["word"]=="bien" or text[i-1]["word"]=="parce" or text[i-1]["word"]=="pendant") and (text[i]["word"]=="que" or text[i]["word"]=="qu'"): 
+                if (text[i-1]["word"]=="alors" or text[i-1]["word"]=="bien" or text[i-1]["word"]=="dès" or text[i-1]["word"]=="parce" or text[i-1]["word"]=="pendant") and (text[i]["word"]=="que" or text[i]["word"]=="qu'"): 
                         text[i]["isProp"]=" "
                         text[i]["rule"]="701"
-                if (text[i-2]["word"]=="en" and text[i-1]["word"]=="tant" and text[i]["word"]=="que"): 
+                if (((text[i-2]["word"]=="du" and text[i-1]["word"]=="fait") or (text[i-2]["word"]=="en" and text[i-1]["word"]=="tant")) and text[i]["word"]=="que"): 
+                        text[i-2]["isProp"]=" "
+                        text[i-2]["rule"]="701"
                         text[i-1]["isProp"]=" "
                         text[i-1]["rule"]="701"
-                        text[i]["isProp"]=" "
+                        text[i]["isProp"]="P"
                         text[i]["rule"]="701"
                                         
                 # 702 Mots composés avec "par"

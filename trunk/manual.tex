@@ -192,6 +192,8 @@ Les règles suivantes sont appliquées pour étiqueter les éléments
 du texte étiqueté par TreeTagger en mots et propositions.
 
 \begin{itemize}
+\item \textbf{001 Interjections :}\\
+ Interjections non reconnues par TreeTagger => pas mot, pas proposition
 \item \textbf{002 Ponctuation et symboles :}\\
  Signe de ponctuation, symbole => pas mot
 \item \textbf{020 Répétition ou correction d'un mot (mode oral) :}\\
@@ -240,6 +242,10 @@ oui et non : pas proposition
  AUX + mot + VERBE => une seule proposition
 \item \textbf{500 Passif :}\\
  participe passé + "par" => "par" non proposition
+item \textbf{509 "à" + infinitif :}\\
+ "à" + infinitif => "à" non proposition
+item \textbf{510 Gérondif :}\\
+ "en" + "participe présent" => "en" non proposition 
 \item \textbf{512 Verbes suivis d'une préposition naturelle :}\\
  "à" non prop si précédé de aller, voyager\\
  "de" non prop si précédé de venir
@@ -303,12 +309,12 @@ CPIDR & \Densidees & Commentaire\\
 401 & & \\ 
 402 & 402 & \\ 
 405 & 405 & \\ 
-510 & & \\ 
+510 & 509,510 & \\ 
 511 & & \\ 
 512 & 512 & Désactivée dans CPIDR\\ 
 610 & & \\ 
 632 & & \\ 
-634 & 600, 601, 602, 701 & \\ 
+634 & 600, 601, 602, 701, 702, 703 & \\ 
 \hline
 \end{tabular}
 \normalsize
@@ -390,7 +396,7 @@ along with Densidees.  If not, see \url{http://www.gnu.org/licenses/}.
 
 ?? 1.2 :
 \begin{itemize}
-\item 29 règles 002, 020, 023, 024, 200, 054, 201, 202, 203, 204, 206, 207, 210, 211, 212, 213, 214, 301, 302, 402, 405, 500, 512, 600, 601, 602, 701, 702, 703
+\item 32 règles 001, 002, 020, 023, 024, 200, 054, 201, 202, 203, 204, 206, 207, 210, 211, 212, 213, 214, 301, 302, 402, 405, 500, 509, 510, 512, 600, 601, 602, 701, 702, 703
 \end{itemize}
 
 2009/12/12 1.1 :
