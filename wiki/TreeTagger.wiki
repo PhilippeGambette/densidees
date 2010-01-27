@@ -1,5 +1,3 @@
-#TreeTagger
-
 TreeTagger est l'étiqueteur morphosyntaxique utilisé pour étiqueter le texte fourni en entrée de Densidées.
 
 Une version en ligne est utilisable [http://cental.fltr.ucl.ac.be/treetagger/ sur le site de l'UCL], mais une version qui étiquette les auxiliaires avec le tag "VER:aux" est préférable pour Densidées.
