@@ -202,6 +202,8 @@ du texte étiqueté par TreeTagger en mots et propositions.
  A B A B ou préfixe-de-A préfixe-de-B A B => premier A et premier B : pas mot, pas proposition
 \item \textbf{024 Répétition ou correction de 3 mots (mode oral) :}\\
  A B C A B C ou préfixe-de-A préfixe-de-B préfixe-de-C A B C => premier A, premier B et premier C : pas mot, pas proposition
+\item \textbf{101 Est-ce que (mode oral) :}\\
+ Rien n'est compté comme proposition
 \item \textbf{200 Etiquetage basique des propositions :}\\
  Les tags correspondant à des propositions sont marqués comme propositions\\
  KON, NUM, DET*, PRP*, ADJ, PRO:POS, PRO:IND, ADV, VER*, PRO:REL
@@ -225,7 +227,7 @@ du texte étiqueté par TreeTagger en mots et propositions.
 \item \textbf{210 Oui et non (mode oral) :}\\
 oui et non : pas proposition
 \item \textbf{211 Négation :}\\
- "pas" "plus" "guère" "point" "aucun" "aucune" "jamais" "rien" précédé (à distance 1, 2 ou 3) par "ne" : seul "ne" proposition
+ "aucun" "guère" "jamais" "nul" "pas" "plus" "point" "que" "rien" précédé (à distance 1, 2 ou 3) par "ne" : seul "ne" proposition
 \item \textbf{212 Négation suivie de "de" :}\\
  "de" n'est pas une proposition si précédée par négation
 \item \textbf{213 Futur proche :}\\
@@ -287,7 +289,7 @@ CPIDR & \Densidees & Commentaire\\
 023 & 023 & \\ 
 050 & & \\ 
 054 & 054 & \\ 
-101 & & Inversion\\ 
+101 & 101 & Interrogation "est-ce que"\\ 
 200 & 200 & \\ 
 201 & 201 & \\ 
 202 & 202 & Désactivée dans CPIDR\\ 
@@ -352,7 +354,7 @@ pour déterminer si le mot est une proposition.
 Bien que \Densidees ~soit un logiciel libre sous licence GPL,
 nous aimerions que vous fassiez référence à l'article suivant
 si vous l'utilisez dans une publication :
-Hye Ran Lee \& Philippe Gambette. Utilisation de l'analyse
+Hye Ran Lee, Philippe Gambette \& Melissa Barkat-Defradas. Utilisation de l'analyse
 textuelle automatique dans la recherche sur la maladie d'Alzheimer.
 Soumis au Colloque international des jeunes chercheurs
 en Didactique des Langues et en Linguistique (CEDIL 2010) \cite{LeeGambette2009}.
@@ -396,7 +398,8 @@ along with Densidees.  If not, see \url{http://www.gnu.org/licenses/}.
 
 ?? 1.2 :
 \begin{itemize}
-\item 32 règles 001, 002, 020, 023, 024, 200, 054, 201, 202, 203, 204, 206, 207, 210, 211, 212, 213, 214, 301, 302, 402, 405, 500, 509, 510, 512, 600, 601, 602, 701, 702, 703
+\item prétraitement des auxiliaires si pas fait par TreeTagger
+\item 33 règles 001, 002, 020, 023, 024, 200, 054, 101, 201, 202, 203, 204, 206, 207, 210, 211, 212, 213, 214, 301, 302, 402, 405, 500, 509, 510, 512, 600, 601, 602, 701, 702, 703
 \end{itemize}
 
 2009/12/12 1.1 :
@@ -422,6 +425,10 @@ along with Densidees.  If not, see \url{http://www.gnu.org/licenses/}.
 Nous remercions le LIRMM et l'association Contact, partenaires de la journée
 Osidmesh\footnote{~\url{http://www.lirmm.fr/~semindoc/Osidmesh.html}}
 à l'origine de la collaboration qui a débouché sur la conception de ce logiciel.
+
+Elsa Maillé et Constance Thuillier ont également contribué à
+l'ajout de règles dans ce logiciel, ainsi qu'à son évaluation
+par l'étiquetage manuel de corpus de test.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \printindex

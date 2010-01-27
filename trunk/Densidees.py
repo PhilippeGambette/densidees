@@ -3,9 +3,9 @@
 #C:\Python26\Python.exe C:\These\2009Densidees\densidees\Densidees.py C:\These\2009Densidees\densidees\Test.txt
 
 #######################################################################
-# Copyright 2009 Philippe Gambette, Hye-Ran Lee
+# Copyright 2010 Philippe Gambette, Hye-Ran Lee
 # 
-# Densidees v1.1 (12/12/2009).
+# Densidees v1.2 beta (27/01/2010).
 #
 # Densidees is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -165,21 +165,36 @@ if os.path.isfile(thefile):
         text=openText(thefile,tagger)
         i=0
         mode="normal"
-        # Treat each word of the text
+
+        # Prétraitement auxiliaire si TreeTagger ne le fait pas
+        while i < len(text):
+                if (tagger=="treetagger" and ((text[i-1]["lemma"]=="être") or (text[i-1]["lemma"]=="suivre|être") or (text[i-1]["lemma"]=="avoir")) and (text[i]["tag"]=="VER:pper")):
+                        text[i-1]["tag"]="VER:aux"
+                if (tagger=="treetagger" and ((text[i-2]["lemma"]=="être") or (text[i-2]["lemma"]=="suivre|être") or (text[i-2]["lemma"]=="avoir")) and (text[i-1]["tag"]=="ADV") and (text[i]["tag"]=="VER:pper")):
+                        text[i-2]["tag"]="VER:aux"
+                i+=1
+
+        i=0
+        # Application des règles
         while i < len(text):
                 #print text[i]["word"]
                 if text[i]["word"]=="(":
                         mode="noprop"
                 if text[i]["word"]==")":
                         mode="normal"
+                if text[i]["word"]=="[":
+                        mode="noword"
+                if text[i]["word"]=="]":
+                        mode="normal"
+                        
                 # 001 Interjections (mode oral)
                 # Interjections non reconnues par TreeTagger => pas mot, pas proposition
                 if (oral==1 and tagger=="treetagger" and (text[i]["word"]=="tiens" or text[i]["word"]=="heu")):
                         text[i]["tag"]="INT"
-                        text[i]["rule"]="002"                        
+                        text[i]["rule"]="001"                        
                 if (tagger=="treetagger" and text[i]["tag"]=="ADV" and text[i]["word"]=="ben"):
                         text[i]["tag"]="INT"
-                        text[i]["rule"]="002"
+                        text[i]["rule"]="001"
                 
                 # 002 Ponctuation et symboles (mode oral)
                 # Signe de ponctuation, symbole => pas mot
@@ -219,6 +234,7 @@ if os.path.isfile(thefile):
                 
                 # 023 Répétition ou correction de 2 mots (mode oral)
                 # A B A B ou préfixe-de-A préfixe-de-B A B => premier A et premier B : pas mot, pas proposition
+                # CHECK Vérifier que la règle du préfixe est pertinente ou la remplacer par []
                 if ((oral==1 and text[i]["word"].find(text[i-2]["word"])==0 and text[i-1]["word"].find(text[i-3]["word"])==0)):
                         text[i-3]["isWord"]=" "
                         text[i-3]["isProp"]=" "
@@ -246,6 +262,14 @@ if os.path.isfile(thefile):
                 # passif : problème de "par" ? Ne pas le compter si précédé d'un verbe au passif ?
                 
                 # 101 est-ce que ...
+                # Ne pas compter comme proposition en mode oral
+                if ((oral==1) and (text[i-2]["lemma"]=="est") and (text[i-1]["lemma"]=="ce") and (text[i]["lemma"]=="que")):
+                        text[i-2]["isProp"]=" "
+                        text[i-2]["rule"]="101"
+                        text[i-1]["isProp"]=" "
+                        text[i-1]["rule"]="101"
+                        text[i]["isProp"]=" "
+                        text[i]["rule"]="101"
 
           
                 # 200 Etiquetage basique des propositions
@@ -352,8 +376,8 @@ if os.path.isfile(thefile):
                         
 
                 # 211 Négation
-                # "pas" "plus" "guère" "point" "aucun" "aucune" "jamais" "rien" précédé (à distance 1, 2 ou 3) par "ne" : seul "ne" proposition
-                if (tagger=="treetagger" and ((text[i]["word"]=="pas" or text[i]["word"]=="plus" or text[i]["word"]=="guère" or text[i]["word"]=="point" or text[i]["lemma"]=="aucun" or text[i]["lemma"]=="nul" or text[i]["word"]=="jamais" or text[i]["word"]=="rien") and (text[i-1]["lemma"]=="ne" or text[i-2]["lemma"]=="ne" or text[i-3]["lemma"]=="ne"))):
+                # "aucun" "guère" "jamais" "nul" "pas" "plus" "point" "que" "rien" précédé (à distance 1, 2 ou 3) par "ne" : seul "ne" proposition
+                if (tagger=="treetagger" and ((text[i]["lemma"]=="aucun"  or text[i]["word"]=="guère" or text[i]["word"]=="jamais" or text[i]["lemma"]=="nul" or text[i]["word"]=="pas" or text[i]["word"]=="plus" or text[i]["word"]=="point" or text[i]["word"]=="que" or text[i]["word"]=="rien") and (text[i-1]["lemma"]=="ne" or text[i-2]["lemma"]=="ne" or text[i-3]["lemma"]=="ne"))):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="211"
 
@@ -510,6 +534,9 @@ if os.path.isfile(thefile):
                 if text[i-1]["word"]=="quand" and (text[i]["word"]=="-même"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="701"
+                if text[i-1]["lemma"]=="entre" and (text[i]["lemma"]=="autre"):
+                        text[i]["isProp"]=" "
+                        text[i]["rule"]="701"
                 if text[i-2]["word"]=="tout" and (text[i-1]["word"]=="de" and text[i]["word"]=="même"):
                         text[i-1]["isProp"]=" "
                         text[i-1]["rule"]="701" 
@@ -559,6 +586,12 @@ if os.path.isfile(thefile):
                 
                 if oral==1 and mode=="noprop":
                         text[i]["isProp"]=" "
+                        
+                if oral==1 and mode=="noword":
+                        text[i]["isProp"]=" "
+                        text[i]["isWord"]=" "
+
+
                         
                 i+=1
 
@@ -622,7 +655,3 @@ else:
                 print filename," - file does not exist!"
                 print "Please use option help to display the possible parameters."
                 
-                
-                
-                
-
