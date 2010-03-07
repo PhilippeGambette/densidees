@@ -204,6 +204,8 @@ du texte étiqueté par TreeTagger en mots et propositions.
  A B C A B C ou préfixe-de-A préfixe-de-B préfixe-de-C A B C => premier A, premier B et premier C : pas mot, pas proposition
 \item \textbf{101 Est-ce que (mode oral) :}\\
  Rien n'est compté comme proposition
+\item \textbf{102 Clivages :}\\
+ "c'est" + au plus 5 mots + "que" ou "qui" : "être" non compté comme proposition
 \item \textbf{200 Etiquetage basique des propositions :}\\
  Les tags correspondant à des propositions sont marqués comme propositions\\
  KON, NUM, DET*, PRP*, ADJ, PRO:POS, PRO:IND, ADV, VER*, PRO:REL
@@ -224,6 +226,8 @@ du texte étiqueté par TreeTagger en mots et propositions.
 "de" n'est pas proposition après "falloir", "agir", "arriver", "paraître"
 \item \textbf{207 "que" non proposition :}\\
 "que" n'est pas proposition après "falloir", "sembler", "arriver", "paraître"
+\item \textbf{208 Comparatifs :}\\
+"autant" ou "moins" ou "plus" + <3 mots + "que" : "que" non proposition
 \item \textbf{210 Oui et non (mode oral) :}\\
 oui et non : pas proposition
 \item \textbf{211 Négation :}\\
@@ -356,7 +360,7 @@ nous aimerions que vous fassiez référence à l'article suivant
 si vous l'utilisez dans une publication :
 Hye Ran Lee, Philippe Gambette \& Melissa Barkat-Defradas. Utilisation de l'analyse
 textuelle automatique dans la recherche sur la maladie d'Alzheimer.
-Soumis au Colloque international des jeunes chercheurs
+Poster au Colloque international des jeunes chercheurs
 en Didactique des Langues et en Linguistique (CEDIL 2010) \cite{LeeGambette2009}.
 %\Densidees is a collection of Python scripts which creates
 %the tree cloud visualization of a text, with a large choice of parameters.
@@ -396,10 +400,10 @@ along with Densidees.  If not, see \url{http://www.gnu.org/licenses/}.
 \mysection{Historique des versions}\label{history}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-?? 1.2 :
+2010/03/07 1.2 :
 \begin{itemize}
 \item prétraitement des auxiliaires si pas fait par TreeTagger
-\item 33 règles 001, 002, 020, 023, 024, 200, 054, 101, 201, 202, 203, 204, 206, 207, 210, 211, 212, 213, 214, 301, 302, 402, 405, 500, 509, 510, 512, 600, 601, 602, 701, 702, 703
+\item 35 règles 001, 002, 020, 023, 024, 101, 102, 200, 054, 201, 202, 203, 204, 206, 207, 208, 210, 211, 212, 213, 214, 301, 302, 402, 405, 500, 509, 510, 512, 600, 601, 602, 701, 702, 703
 \end{itemize}
 
 2009/12/12 1.1 :

@@ -5,7 +5,7 @@
 #######################################################################
 # Copyright 2010 Philippe Gambette, Hye-Ran Lee
 # 
-# Densidees v1.2 beta (27/01/2010).
+# Densidees v1.2 (07/03/2010).
 #
 # Densidees is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -91,6 +91,15 @@ def openText(filename,tagger):
                                 text.append(item)
                         else:
                                 print "Ligne",i,"non traitée :",line
+                                item={}
+                                item["word"]=" "
+                                item["tag"]="INT"
+                                item["lemma"]=" "
+                                item["rule"]="000"
+                                item["isWord"]=" "
+                                item["isProp"]=" "
+                                #print item
+                                text.append(item)
                 else:
                         res=re.search("^([0-9]+)	([0-9]+)	([0-9]+)		([^	]+)	([^	]+)	([^	]*)	([0-9]+)	([^	]+)	([^	]+).*",line)
                         #print line
@@ -170,8 +179,12 @@ if os.path.isfile(thefile):
         while i < len(text):
                 if (tagger=="treetagger" and ((text[i-1]["lemma"]=="être") or (text[i-1]["lemma"]=="suivre|être") or (text[i-1]["lemma"]=="avoir")) and (text[i]["tag"]=="VER:pper")):
                         text[i-1]["tag"]="VER:aux"
-                if (tagger=="treetagger" and ((text[i-2]["lemma"]=="être") or (text[i-2]["lemma"]=="suivre|être") or (text[i-2]["lemma"]=="avoir")) and (text[i-1]["tag"]=="ADV") and (text[i]["tag"]=="VER:pper")):
+                if (tagger=="treetagger" and ((text[i-2]["lemma"]=="être") or (text[i-2]["lemma"]=="suivre|être") or (text[i-2]["lemma"]=="avoir")) and text[i-1]["tag"]=="ADV" and text[i]["tag"]=="VER:pper"):
                         text[i-2]["tag"]="VER:aux"
+                #if (tagger=="treetagger" and ((text[i-3]["lemma"]=="être") or (text[i-2]["lemma"]=="suivre|être") or (text[i-2]["lemma"]=="avoir")) and text[i]["tag"]=="VER:pper"):
+                #        text[i-3]["tag"]="VER:aux"
+                if (tagger=="treetagger" and text[i]["lemma"]=="oui"):
+                        text[i]["tag"]="ADV"
                 i+=1
 
         i=0
@@ -194,8 +207,11 @@ if os.path.isfile(thefile):
                         text[i]["rule"]="001"                        
                 if (tagger=="treetagger" and text[i]["tag"]=="ADV" and text[i]["word"]=="ben"):
                         text[i]["tag"]="INT"
+                        text[i]["rule"]="001"                
+                if text[i]["word"]=="parce":
+                        text[i]["tag"]="INT"
                         text[i]["rule"]="001"
-                
+
                 # 002 Ponctuation et symboles (mode oral)
                 # Signe de ponctuation, symbole => pas mot
                 #if re.search("^[a-zA-Zéèçàùêîôûäëïöü0-9]",text[i]["word"]) and text[i]["tag"]!="SYM":
@@ -263,13 +279,30 @@ if os.path.isfile(thefile):
                 
                 # 101 est-ce que ...
                 # Ne pas compter comme proposition en mode oral
-                if ((oral==1) and (text[i-2]["lemma"]=="est") and (text[i-1]["lemma"]=="ce") and (text[i]["lemma"]=="que")):
+                if ((oral==1) and (text[i-2]["lemma"]=="être") and (text[i-1]["lemma"]=="ce") and (text[i]["lemma"]=="que")):
                         text[i-2]["isProp"]=" "
                         text[i-2]["rule"]="101"
                         text[i-1]["isProp"]=" "
                         text[i-1]["rule"]="101"
                         text[i]["isProp"]=" "
                         text[i]["rule"]="101"
+
+
+                # 102 Clivages
+                # C'est + (au plus 5 mots) + "que" ou "qui" : "est" non compté comme proposition
+                if ((text[i]["lemma"]=="que") or (text[i]["lemma"]=="qui")):
+                        if ((text[i-2]["lemma"]=="ce") and (text[i-1]["lemma"]=="être")):
+                                text[i-1]["isProp"]=" "
+                                text[i-1]["rule"]="102"
+                        if ((text[i-3]["lemma"]=="ce") and (text[i-2]["lemma"]=="être")):
+                                text[i-2]["isProp"]=" "
+                                text[i-2]["rule"]="102"
+                        if ((text[i-4]["lemma"]=="ce") and (text[i-3]["lemma"]=="être")):
+                                text[i-3]["isProp"]=" "
+                                text[i-3]["rule"]="102"
+                        if ((text[i-5]["lemma"]=="ce") and (text[i-4]["lemma"]=="être")):
+                                text[i-4]["isProp"]=" "
+                                text[i-4]["rule"]="102"
 
           
                 # 200 Etiquetage basique des propositions
@@ -293,6 +326,9 @@ if os.path.isfile(thefile):
                         text[i]["isProp"]="P"
                         text[i]["rule"]="054"
                 if (tagger=="treetagger" and text[i]["word"]=="Ca") :
+                        text[i]["isProp"]=" "
+                        text[i]["rule"]="054"
+                if (tagger=="treetagger" and (text[i-1]["lemma"]=="celui") and (text[i]["lemma"]=="là" or text[i]["lemma"]=="ci")) :
                         text[i]["isProp"]=" "
                         text[i]["rule"]="054"
                           
@@ -344,7 +380,7 @@ if os.path.isfile(thefile):
                 if text[i]["lemma"]=="de" and (text[i-1]["lemma"]=="agir" or text[i-1]["lemma"]=="arriver" or text[i-1]["lemma"]=="falloir" or text[i-1]["lemma"]=="paraître"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="206"
-                if text[i]["lemma"]=="de" and (text[i-1]["word"]=="envie" or text[i-1]["word"]=="lieu" or text[i-1]["word"]=="peur"  or text[i-1]["word"]=="pitié" or text[i-1]["word"]=="soin") and text[i-2]["lemma"]=="avoir":
+                if text[i]["lemma"]=="de" and (text[i-1]["word"]=="envie" or text[i-1]["word"]=="lieu" or text[i-1]["word"]=="pitié" or text[i-1]["word"]=="soin") and (text[i-2]["lemma"]=="avoir" or text[i-3]["lemma"]=="avoir"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="206"
                 if text[i]["lemma"]=="de" and (text[i-1]["lemma"]=="près" or text[i-1]["lemma"]=="auprès"):
@@ -363,9 +399,20 @@ if os.path.isfile(thefile):
 
                 # 207 "que" non proposition
                 # "que" n'est pas proposition après "falloir", "sembler", "arriver", "paraître"
-                if text[i]["word"]=="que" and (text[i-1]["lemma"]=="falloir" or text[i-1]["lemma"]=="sembler" or text[i-1]["lemma"]=="arriver" or text[i-1]["lemma"]=="paraître"):
+                if text[i]["lemma"]=="que" and (text[i-1]["lemma"]=="falloir" or text[i-1]["lemma"]=="sembler" or text[i-1]["lemma"]=="arriver" or text[i-1]["lemma"]=="paraître"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="207"
+                if oral==1 and (text[i-2]["word"]=="est" and text[i-1]["word"]=="vrai" and text[i]["lemma"]=="que"):
+                        text[i]["isProp"]=" "
+                        text[i]["rule"]="207"
+
+
+                # 208 Comparatif
+                # "que" n'est pas proposition après "autant", "moins", "pire", "plus"
+                if text[i]["lemma"]=="que" and (text[i-1]["lemma"]=="autant" or text[i-1]["lemma"]=="plus" or text[i-1]["lemma"]=="moins") and (text[i-2]["lemma"]=="autant" or text[i-2]["lemma"]=="plus" or text[i-2]["lemma"]=="moins")  and (text[i-3]["lemma"]=="autant" or text[i-3]["lemma"]=="plus" or text[i-3]["lemma"]=="moins"):
+                        text[i]["isProp"]=" "
+                        text[i]["rule"]="207"
+
                 
                                         
                 # 210 Oui et non (mode oral)
@@ -377,7 +424,7 @@ if os.path.isfile(thefile):
 
                 # 211 Négation
                 # "aucun" "guère" "jamais" "nul" "pas" "plus" "point" "que" "rien" précédé (à distance 1, 2 ou 3) par "ne" : seul "ne" proposition
-                if (tagger=="treetagger" and ((text[i]["lemma"]=="aucun"  or text[i]["word"]=="guère" or text[i]["word"]=="jamais" or text[i]["lemma"]=="nul" or text[i]["word"]=="pas" or text[i]["word"]=="plus" or text[i]["word"]=="point" or text[i]["word"]=="que" or text[i]["word"]=="rien") and (text[i-1]["lemma"]=="ne" or text[i-2]["lemma"]=="ne" or text[i-3]["lemma"]=="ne"))):
+                if (tagger=="treetagger" and ((text[i]["lemma"]=="aucun"  or text[i]["word"]=="guère" or text[i]["word"]=="jamais" or text[i]["lemma"]=="nul" or text[i]["word"]=="pas" or text[i]["word"]=="plus" or text[i]["word"]=="point" or text[i]["lemma"]=="que" or text[i]["word"]=="rien") and (text[i-1]["lemma"]=="ne" or text[i-2]["lemma"]=="ne" or text[i-3]["lemma"]=="ne"))):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="211"
 
@@ -406,9 +453,12 @@ if os.path.isfile(thefile):
 
                 # 301 Verbes de liaison
                 # Verbe de liaison pas proposition si suivi d'un adjectif ou d'un adverbe
-                if (tagger=="treetagger" and ((text[i]["tag"]=="ADJ" or text[i]["tag"]=="ADV") and isLink(text[i-1]["lemma"]))) or (tagger=="cordial" and ((text[i]["tag"][0]=="A" or text[i]["tag"][0]=="R") and isLink(text[i-1]["lemma"]))):
+                if (tagger=="treetagger" and ((text[i]["tag"]=="ADJ" or (text[i]["tag"]=="ADV" and text[i]["word"]!="pas")) and isLink(text[i-1]["lemma"]))) or (tagger=="cordial" and ((text[i]["tag"][0]=="A" or text[i]["tag"][0]=="R") and isLink(text[i-1]["lemma"]))):
                         text[i-1]["isProp"]=" "
                         text[i-1]["rule"]="301"
+                #if (tagger=="treetagger" and ((text[i]["tag"]=="ADJ") and isLink(text[i-2]["lemma"]))) or (tagger=="cordial" and ((text[i]["tag"][0]=="A" or text[i]["tag"][0]=="R") and isLink(text[i-2]["lemma"]))):
+                #        text[i-2]["isProp"]=" "
+                #        text[i-2]["rule"]="301"
                 if (text[i-2]["lemma"]=="avoir" and text[i]["lemma"]=="le" and text[i]["lemma"]=="air"):
                         text[i]["isProp"]=" "
                         text[i-1]["isProp"]=" "
@@ -423,6 +473,9 @@ if os.path.isfile(thefile):
                 if (tagger=="treetagger" and (text[i]["tag"]=="PRP" and (text[i-1]["lemma"]=="être" or text[i-1]["lemma"]=="suivre|être"))):
                         text[i-1]["isProp"]=" "
                         text[i-1]["rule"]="302"
+                if (tagger=="treetagger" and (text[i]["tag"]=="PRP" and (text[i-1]["tag"]=="ADV") and (text[i-2]["lemma"]=="être" or text[i-2]["lemma"]=="suivre|être"))):
+                        text[i-2]["isProp"]=" "
+                        text[i-2]["rule"]="302"
                         
 
 
@@ -489,10 +542,13 @@ if os.path.isfile(thefile):
                 # Parler : tu parles, parle-moi de/ parlez-moi de, parle-moi-z-en pas/ parlez-moi-z-en pas, parlons-en
                 # Pense-z-y pas/ pensez-y pas
                 # regarde-moi ça/ regardez-moi ça, regarde donc
-                if oral==1 and (text[i]["word"]=="admettons" or text[i]["word"]=="allons" or text[i]["word"]=="allonz" or text[i]["word"]=="va" or text[i]["word"]=="attends" or text[i]["word"]=="attendez" or text[i]["word"]=="va" or text[i]["word"]=="comprenez" or text[i]["word"]=="disons" or text[i]["word"]=="dis" or text[i]["word"]=="va" or text[i]["word"]=="écoute" or text[i]["word"]=="écoutez" or text[i]["word"]=="coudon" or text[i]["word"]=="mettons" or text[i]["word"]=="mettez" or text[i]["word"]=="regarde" or text[i]["word"]=="regardez" or text[i]["word"]=="voyons" or text[i]["word"]=="enfin" or text[i]["word"]=="voilà"):
+                # CHECK 
+                
+                # or text[i]["word"]=="va" or text[i]["word"]=="dis"
+                if oral==1 and (text[i]["word"]=="admettons" or text[i]["word"]=="allez" or text[i]["word"]=="allons" or text[i]["word"]=="attends" or text[i]["word"]=="attendez" or text[i]["word"]=="comprenez" or text[i]["word"]=="disons" or text[i]["word"]=="écoute" or text[i]["word"]=="écoutez" or text[i]["word"]=="mettons" or text[i]["word"]=="mettez" or text[i]["word"]=="regarde" or text[i]["word"]=="regardez" or text[i]["word"]=="voyons" or text[i]["word"]=="enfin" or text[i]["word"]=="voilà"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="600"
-                if oral==1 and ((text[i-1]["word"]=="va" and text[i]["word"]=="donc") or (text[i-1]["word"]=="ça" and text[i]["word"]=="va") or (text[i-1]["word"]=="attends" and text[i]["word"]=="voir") or (text[i-1]["word"]=="attendez" and text[i]["word"]=="voir") or (text[i-1]["word"]=="tu" and text[i]["word"]=="comprends") or (text[i-1]["word"]=="vous" and text[i]["word"]=="comprenez") or (text[i-1]["word"]=="comprends" and text[i]["word"]=="tu") or (text[i-1]["word"]=="comprenez" and text[i]["word"]=="vous") or (text[i-1]["word"]=="je" and text[i]["word"]=="comprends") or (text[i-1]["word"]=="dis" and text[i]["word"]=="donc") or (text[i-1]["word"]=="tu" and text[i]["word"]=="vois") or (text[i-1]["word"]=="vous" and text[i]["word"]=="voyez") or (text[i-1]["word"]=="figure" and text[i]["word"]=="toi") or (text[i-1]["word"]=="figurez" and text[i]["word"]=="vous") or (text[i-1]["word"]=="je" and text[i]["word"]=="imagine")):
+                if oral==1 and ((text[i-1]["word"]=="va" and text[i]["word"]=="donc") or (text[i-1]["word"]=="ça" and text[i]["word"]=="va") or (text[i-1]["word"]=="attends" and text[i]["word"]=="voir") or (text[i-1]["word"]=="attendez" and text[i]["word"]=="voir") or (text[i-1]["word"]=="tu" and text[i]["word"]=="comprends") or (text[i-1]["word"]=="vous" and text[i]["word"]=="comprenez") or (text[i-1]["word"]=="comprends" and text[i]["word"]=="tu") or (text[i-1]["word"]=="comprenez" and text[i]["word"]=="vous") or (text[i-1]["word"]=="dis" and text[i]["word"]=="donc") or (text[i-1]["word"]=="tu" and text[i]["word"]=="vois") or (text[i-1]["word"]=="vous" and text[i]["word"]=="voyez") or (text[i-1]["word"]=="figure" and text[i]["word"]=="toi") or (text[i-1]["word"]=="figurez" and text[i]["word"]=="vous") or (text[i-1]["word"]=="je" and text[i]["word"]=="imagine")):
                         text[i-1]["isProp"]=" "
                         text[i-1]["rule"]="600"
                         text[i]["isProp"]=" "
@@ -523,15 +579,44 @@ if os.path.isfile(thefile):
                 # copule -> "passer pour"
                 # adverbe -> "tout à coup", "tout de suite", "de temps en temps", "par ailleurs", "par conséquent", "tout de même", "par contre", "par bonheur", "par malheur"
                 # causalité -> "parce que"
-                # comparaison -> "plus...que","moins...que", "autant...que"
                 # location -> "à côté de", "en face de"
+                if text[i-1]["word"]=="bien" and text[i]["word"]=="sûr":
+                        text[i-1]["isProp"]="P"
+                        text[i-1]["rule"]="701"
+                        text[i]["isProp"]=" "
+                        text[i]["rule"]="701"
+                if text[i-1]["word"]=="bien" and text[i]["word"]=="sûr":
+                        text[i-1]["isProp"]="P"
+                        text[i-1]["rule"]="701"
+                        text[i]["isProp"]=" "
+                        text[i]["rule"]="701"
+                if ((text[i-1]["word"]=="de") or (text[i-1]["word"]=="en")) and text[i]["word"]=="plus":
+                        text[i-1]["isProp"]=" "
+                        text[i-1]["rule"]="701"
+                        text[i]["isProp"]="P"
+                        text[i]["rule"]="701"
+                if text[i-1]["lemma"]=="parce" and text[i]["word"]=="que":
+                        text[i]["isProp"]="P"
+                        text[i]["rule"]="701"
+                if text[i-1]["lemma"]=="tant" and (text[i]["word"]=="pis" or text[i]["word"]=="mieux"):
+                        text[i-1]["isProp"]="P"
+                        text[i-1]["rule"]="701"
+                        text[i]["isProp"]=" "
+                        text[i]["rule"]="701"
                 if text[i-2]["lemma"]=="passer" and (text[i-1]["word"]=="pour" and text[i]["tag"]=="NOM"):
                         text[i-1]["isProp"]=" "
                         text[i-1]["rule"]="701" 
+                if (text[i-2]["lemma"]=="petit" and text[i-1]["lemma"]=="à" and text[i]["lemma"]=="petit"):
+                        text[i-2]["isProp"]=" "
+                        text[i-2]["rule"]="701" 
+                        text[i-1]["isProp"]=" "
+                        text[i-1]["rule"]="701" 
+                        text[i]["isProp"]="P"
+                        text[i]["rule"]="701"
                 if text[i-1]["word"]=="tout" and (text[i]["word"]=="à" or text[i]["word"]=="de"):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="701"
-                if text[i-1]["word"]=="quand" and (text[i]["word"]=="-même"):
+                if text[i-1]["word"]=="quand" and ((text[i]["word"]=="-même") or (text[i]["word"]=="même")):
                         text[i]["isProp"]=" "
                         text[i]["rule"]="701"
                 if text[i-1]["lemma"]=="entre" and (text[i]["lemma"]=="autre"):
@@ -542,16 +627,46 @@ if os.path.isfile(thefile):
                         text[i-1]["rule"]="701" 
                         text[i]["isProp"]=" "
                         text[i]["rule"]="701" 
-                if (text[i-1]["word"]=="alors" or text[i-1]["word"]=="bien" or text[i-1]["word"]=="dès" or text[i-1]["word"]=="parce" or text[i-1]["word"]=="pendant") and (text[i]["word"]=="que" or text[i]["word"]=="qu'"): 
+                if text[i-2]["word"]=="à" and text[i-1]["word"]=="peu" and text[i]["word"]=="près":
+                        text[i-2]["isProp"]=" "
+                        text[i-2]["rule"]="701" 
+                        text[i-1]["isProp"]=" "
+                        text[i-1]["rule"]="701" 
+                if (text[i-1]["word"]=="alors" or text[i-1]["word"]=="bien" or text[i-1]["word"]=="dès" or text[i-1]["word"]=="pendant") and (text[i]["lemma"]=="que"): 
                         text[i]["isProp"]=" "
                         text[i]["rule"]="701"
-                if (((text[i-2]["word"]=="du" and text[i-1]["word"]=="fait") or (text[i-2]["word"]=="en" and text[i-1]["word"]=="tant")) and text[i]["word"]=="que"): 
+                if (((text[i-2]["word"]=="du" and text[i-1]["word"]=="fait") or (text[i-2]["word"]=="en" and text[i-1]["word"]=="tant")) and text[i]["lemma"]=="que"): 
                         text[i-2]["isProp"]=" "
                         text[i-2]["rule"]="701"
                         text[i-1]["isProp"]=" "
                         text[i-1]["rule"]="701"
                         text[i]["isProp"]="P"
                         text[i]["rule"]="701"
+                if (text[i-3]["word"]=="vis" and text[i-2]["word"]=="à" and text[i-1]["word"]=="vis" and text[i]["lemma"]=="de"): 
+                        text[i-3]["isProp"]=" "
+                        text[i-3]["isWord"]=" "
+                        text[i-3]["rule"]="701"
+                        text[i-2]["isProp"]=" "
+                        text[i-2]["isWord"]=" "
+                        text[i-2]["rule"]="701"
+                        text[i-1]["isProp"]=" "
+                        text[i-1]["rule"]="701"
+                        text[i]["isProp"]="P"
+                        text[i]["rule"]="701"                        
+                if (text[i-3]["word"]=="de" and text[i-2]["word"]=="temps" and text[i-1]["word"]=="en" and text[i]["lemma"]=="temps"): 
+                        text[i-3]["isProp"]="P"
+                        text[i-3]["rule"]="701"
+                        text[i-2]["isProp"]=" "
+                        text[i-2]["rule"]="701"
+                        text[i-1]["isProp"]=" "
+                        text[i-1]["rule"]="701"
+                        text[i]["isProp"]=" "
+                        text[i]["rule"]="701"                        
+                if (text[i-1]["word"]=="vis-à-vis" and text[i]["lemma"]=="de"): 
+                        text[i-1]["isProp"]=" "
+                        text[i-1]["rule"]="701"
+                        text[i]["isProp"]="P"
+                        text[i]["rule"]="701"                        
                                         
                 # 702 Mots composés avec "par"
                 # expressions qui ne correspondent qu'à une seule proposition
@@ -654,4 +769,3 @@ else:
                 
                 print filename," - file does not exist!"
                 print "Please use option help to display the possible parameters."
-                
