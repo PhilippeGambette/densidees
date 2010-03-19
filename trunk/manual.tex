@@ -28,7 +28,7 @@
 \parindent=0pt
 \parskip=5pt
 
-\def\Densidees{{\sf Densidees}}
+\def\Densidees{{\sf Densidées}}
 
 %\newcommand\expert[1]{#1}   % expert mode on
 \newcommand\expert[1]{}    % expert mode off
@@ -47,7 +47,7 @@ version \VERSION ~- \dateversion}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\author{Philippe Gambette, Hye-Ran Lee}
+\author{Philippe Gambette, Hyeran Lee}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -79,13 +79,21 @@ version \VERSION ~- \dateversion}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NoAutoSpaceBeforeFDP
 \Densidees ~calcule la densité des idées d'un texte
-(au sens de \cite{Kintsch1974} et \cite{TurnerGreene1977}).
+(au sens de \cite{Kintsch1974} et \cite{TurnerGreene1977},
+c'est à dire le nombre de prédicats divisé par le nombre
+total de mots).
 Il adapte à la langue française le calcul implémenté
 pour la langue anglaise dans le logiciel CPIDR~\cite{BSKHC2008}.
 
 \Densidees ~est un logiciel libre sous licence GPL. Toutefois,
 si vous l'utilisez, nous vous invitons à citer l'article
-qui lui est consacré \cite{LeeGambette2009}.
+qui lui est consacré \cite{LGTMB2010}. Cet article contient
+en particulier une évaluation de l'étiquetage des prédicats
+réalisé automatiquement par \Densidees ~sur un corpus
+oral retranscrit de 13939 mots dont 5747 propositions.
+Les résultats de la version 1.2 sont 2,7\% de faux négatifs
+et 3,1\% de faux positifs, soit un taux d'erreur 
+de 0,5\% sur le nombre de prédicats.
 
 En cas de problème d'utilisation de \Densidees , vous pouvez
 envoyer votre question à \texttt{gambette@lirmm.fr}, accompagnée
@@ -96,7 +104,7 @@ commande (son utilisation est détaillée en section~\ref{lignecommande}).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \mysection{Installation du programme}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Densidees est écrit en Python (version 2.6), il faut donc
+\Densidees est écrit en Python (version 2.6), il faut donc
 commencer par télécharger Python sur
 \url{http://www.python.org/download/releases/2.6/}
 et l'installer (par exemple sous Windows dans \texttt{C:\textbackslash Python26}).
@@ -122,6 +130,29 @@ calculer la densité des idées d'un ensemble de plusieurs fichiers.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \mysection{Utilisation du programme}
 
+\subsection{Sur un corpus oral}
+
+Un mode oral, décrit ci-dessous, est fourni dans \Densidees .
+Toutefois il est également nécessaire, pour l'utilisation
+de ce mode, de prétraiter les corpus
+avec un parenthésage qui conduira aux résultats suivants :
+\begin{itemize}
+\item tous les mots entre crochets ne sont comptés ni comme mots ni comme propositions.
+\item tous les mots entre parenthèses sont comptés comme mots mais pas comme propositions.
+\end{itemize}
+
+Il faut donc utiliser les parenthèses et crochets pour les cas suivants :
+\begin{itemize}
+\item crochets "[]" : mots fragmentés, répétitions exactes,
+pauses remplies non lexicales ("pff", "bah", "hein", etc.), passages inaudibles.
+\item parenthèses "()" : idées répétées, phrases inachevées,
+marqueurs discursifs qui sont des mots en français ("bon", "bien", etc.),
+noms propres (personnes, villes).
+\end{itemize}
+
+Si la transcription est réalisée exclusivement pour un calcul de la densité des idées
+avec \Densidees , on pourra omettre de transcrire les parties entre crochets pour gagner du temps.
+
 \subsection{Avec l'interface graphique sous Windows}
 
 La première étape est d'étiqueter le texte avec TreeTagger.
@@ -142,7 +173,7 @@ texte étiqueté par TreeTagger à l'aide du bouton \emph{Ouvrir le texte}),
 il suffit de cliquer sur le bouton \emph{Calculer !}
 pour voir apparaître le résultat dans le cadre de droite.
 De plus, le résultat s'enregistre dans un fichier portant le
-même nom que le fichier ouvert dans \Densidees, suivi de l'extension
+même nom que le fichier ouvert dans \Densidees , suivi de l'extension
 "\texttt{.di.txt}".
 \begin{figure}[ht] % b floats figure to bottom, p floats to next page, h = here
 \begin{center}
@@ -160,7 +191,9 @@ utiliser est en fait donnée par l'interface graphique de \Densidees ,
 au bas de la fenêtre, et vous pouvez la sélectionner, la copier,
 puis la coller dans la ligne de commande. Par exemple dans la figure~\ref{FigGUI}
 il s'agit de :\\
-\texttt{"C:\textbackslash Python26\textbackslash Python.exe" "C:\textbackslash These\textbackslash densidees\textbackslash Densidees\textbackslash Densidees.py" "C:\textbackslash These\textbackslash densidees\textbackslash  Densidees\textbackslash Test.txt"}.
+\texttt{"C:\textbackslash Python26\textbackslash Python.exe"
+"C:\textbackslash These\textbackslash densidees\textbackslash Densidees\textbackslash Densidees.py"
+"C:\textbackslash These\textbackslash densidees\textbackslash  Densidees\textbackslash Test.txt"}.
 
 \subsection{Directement depuis la ligne de commande Windows}\label{lignecommande}
 
@@ -169,9 +202,14 @@ le \emph{menu Démarrer}, \emph{Exécuter}, en tapant alors \texttt{cmd} puis en a
 sur \emph{Entrée}.
 
 Il faut alors taper une ligne de commande de ce type :
-\texttt{"C:\textbackslash Python26\textbackslash Python.exe" "C:\textbackslash Densidees\textbackslash Densidees.py" "C:\textbackslash Densidees\textbackslash Texte1.txt"}
+\texttt{"C:\textbackslash Python26\textbackslash Python.exe"
+"C:\textbackslash Densidees\textbackslash Densidees.py"
+"C:\textbackslash Densidees\textbackslash Texte1.txt"}
 
-Cette commande signifie qu'on va appeler le logiciel \texttt{Python.exe} pour lui demander de lancer le programme \texttt{Densidees.py} sur le fichier texte \texttt{Texte1.txt} qui contient le résultat de l'étiquetage TreeTagger d'un texte en français.
+Cette commande signifie qu'on va appeler le logiciel \texttt{Python.exe}
+pour lui demander de lancer le programme \texttt{Densidees.py}
+sur le fichier texte \texttt{Texte1.txt} qui contient le résultat
+de l'étiquetage TreeTagger d'un texte en français.
 
 Vous pouvez utiliser l'option \texttt{oral=1} pour utiliser le calcul de densité
 des idées en mode oral (traitement des répétitions). Par exemple, la figure~\ref{FigCMD}
@@ -201,7 +239,8 @@ du texte étiqueté par TreeTagger en mots et propositions.
 \item \textbf{023 Répétition ou correction de 2 mots (mode oral) :}\\
  A B A B ou préfixe-de-A préfixe-de-B A B => premier A et premier B : pas mot, pas proposition
 \item \textbf{024 Répétition ou correction de 3 mots (mode oral) :}\\
- A B C A B C ou préfixe-de-A préfixe-de-B préfixe-de-C A B C => premier A, premier B et premier C : pas mot, pas proposition
+ A B C A B C ou préfixe-de-A préfixe-de-B préfixe-de-C A B C =>
+premier A, premier B et premier C : pas mot, pas proposition
 \item \textbf{101 Est-ce que (mode oral) :}\\
  Rien n'est compté comme proposition
 \item \textbf{102 Clivages :}\\
@@ -231,7 +270,8 @@ du texte étiqueté par TreeTagger en mots et propositions.
 \item \textbf{210 Oui et non (mode oral) :}\\
 oui et non : pas proposition
 \item \textbf{211 Négation :}\\
- "aucun" "guère" "jamais" "nul" "pas" "plus" "point" "que" "rien" précédé (à distance 1, 2 ou 3) par "ne" : seul "ne" proposition
+ "aucun" "guère" "jamais" "nul" "pas" "plus" "point" "que" "rien"
+précédé (à distance 1, 2 ou 3) par "ne" : seul "ne" proposition
 \item \textbf{212 Négation suivie de "de" :}\\
  "de" n'est pas une proposition si précédée par négation
 \item \textbf{213 Futur proche :}\\
@@ -358,10 +398,19 @@ pour déterminer si le mot est une proposition.
 Bien que \Densidees ~soit un logiciel libre sous licence GPL,
 nous aimerions que vous fassiez référence à l'article suivant
 si vous l'utilisez dans une publication :
+Hyeran Lee, Philippe Gambette, Constance Thuillier \& Elsa Maillé.
+Densidées : calcul automatique de la densité des idées dans un corpus oral.
+Soumis à RECITAL 2010~\cite{LGTMB2010}.
+
+L'article suivant montre le lien entre la densité des idées calculée par \Densidees ~et
+la maladie d'Alzheimer :
 Hye Ran Lee, Philippe Gambette \& Melissa Barkat-Defradas. Utilisation de l'analyse
 textuelle automatique dans la recherche sur la maladie d'Alzheimer.
 Poster au Colloque international des jeunes chercheurs
-en Didactique des Langues et en Linguistique (CEDIL 2010) \cite{LeeGambette2009}.
+en Didactique des Langues et en Linguistique (CEDIL 2010)~\cite{LGB2010}.
+
+
+
 %\Densidees is a collection of Python scripts which creates
 %the tree cloud visualization of a text, with a large choice of parameters.
 
@@ -374,26 +423,26 @@ en Didactique des Langues et en Linguistique (CEDIL 2010) \cite{LeeGambette2009}
 \subsection{Licence}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Densidees v.\VERSION ~- \dateversion\\
+\Densidees ~v.\VERSION ~- \dateversion\\
 \url{http://code.google.com/p/densidees/}
 
 ~\\
-Copyright 2009 Philippe Gambette, Hye-Ran Lee\\
+Copyright 2009-2010 Philippe Gambette, Hyeran Lee\\
 ~\\
-Densidees is free software: you can redistribute it and/or modify
+\Densidees ~is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
 ~\\
-Densidees is distributed in the hope that it will be useful,
+\Densidees ~is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 ~\\
 You should have received a copy of the GNU General Public License
-along with Densidees.  If not, see \url{http://www.gnu.org/licenses/}.
+along with \Densidees .  If not, see \url{http://www.gnu.org/licenses/}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
