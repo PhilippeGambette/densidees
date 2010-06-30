@@ -1,11 +1,16 @@
 ****** README DENSIDEES ******
 
-Le programme Densidées calcule la densité des idées d'un texte (au sens de Kintsch 1974 et Turner & Greene 1977). *Attention, il ne fournit qu'une approximation du score de densité des idées, une évaluation est actuellement en cours pour mesurer son taux d'erreur. Un texte étiqueté par TreeTagger doit lui être fourni en entrée, de préférence avec étiquetage des auxiliaires par le tag "VER:aux".*
+Le logiciel libre Densidées calcule la densité des idées d'un texte (au sens de Kintsch 1974 et Turner & Greene 1977, c'est à dire le nombre moyen d'idées exprimées en 10 mots), utile en particulier pour l'analyse des discours de patients atteint de la maladie d'Alzheimer.
 
-Densidées adapte à la langue française le calcul de densité d'idées implémenté pour la langue anglaise dans le logiciel [http://www.ai.uga.edu/caspr/ CPIDR], détaillé dans la publication suivante :
-Brown, Cati; Snodgrass, Tony; Kemper, Susan J.; Herman, Ruth; and Covington, Michael A. (2008) [http://www.ai.uga.edu/caspr/BrownSnodgrassKemperHermanCovington2008.pdf Automatic measurement of propositional idea density from part-of-speech tagging]. Behavior Research Methods 40 (2) 540-545.
+Un texte étiqueté par TreeTagger doit lui être fourni en entrée. La performance du logiciel a été évaluée dans l'article indiqué ci-dessous (Lee et al., RECITAL 2010) sur un corpus oral retranscrit de 13939 mots dont 5747 propositions. Les résultats de la version 1.2 présentent 2,7% de faux négatifs et 3,1% de faux positifs, soit un taux d'erreur de 0,5% sur le nombre de prédicats.
 
-Il a été créé dans le cadre d'une collaboration issue de la [http://www.lirmm.fr/~semindoc/Osidmesh.html journée OSIDMESH] d'octobre 2009, par [http://www.univ-montp3.fr/praxiling/spip.php?article229 Hye-Ran Lee] et [http://www.lirmm.fr/~gambette Philippe Gambette], doctorants des laboratoires [http://www.univ-montp3.fr/praxiling/ Praxiling] et [http://www.lirmm.fr LIRMM] de Montpellier. Mélissa Barkat-Defradas, Elsa Maillé et Constance Thuillier ont également contribué à la conception de ce logiciel.
+Densidées adapte à la langue française le calcul de densité d'idées implémenté pour la langue anglaise dans le logiciel CPIDR (http://www.ai.uga.edu/caspr/), détaillé dans la publication suivante :
+Cati Brown, Tony Snodgrass, Susan J. Kemper, Ruth Herman, et Michael A. Covington (2008) [http://www.ai.uga.edu/caspr/BrownSnodgrassKemperHermanCovington2008.pdf Automatic measurement of propositional idea density from part-of-speech tagging]. Behavior Research Methods 40 (2) 540-545.
+
+Il a été créé dans le cadre d'une collaboration issue de la journée OSIDMESH (http://www.lirmm.fr/~semindoc/Osidmesh.html) d'octobre 2009, par Hyeran Lee (http://www.univ-montp3.fr/praxiling/spip.php?article229) et Philippe Gambette (http://www.lirmm.fr/~gambette), doctorants des laboratoires Praxiling (http://www.univ-montp3.fr/praxiling/) et LIRMM (http://www.lirmm.fr) de Montpellier. Melissa Barkat-Defradas (http://www.univ-montp3.fr/praxiling/spip.php?article22), Elsa Maillé et Constance Thuillier ont également contribué à la conception de ce logiciel, qui a donné lieu aux publications suivantes :
+ * Hyeran Lee, Philippe Gambette, Constance Thuillier et Elsa Maillé (2010) [http://halshs.archives-ouvertes.fr/halshs-00495768/fr/ Densidées : calcul automatique de la densité des idées dans un corpus oral]. Actes de RECITAL 2010.
+ * Hyeran Lee, Philippe Gambette et Melissa Barkat-Defradas (2010) [http://www.lirmm.fr/~gambette/2010LeeGambetteBarkat.pdf Utilisation de l'analyse textuelle automatique dans la recherche sur la maladie d'Alzheimer]. Poster à CEDIL 2010 (http://www.lirmm.fr/~gambette/2010LeeGambetteBarkatPoster.pdf).
+
 
 == Installation et utilisation ==
 
@@ -18,14 +23,24 @@ Elle contient en particulier :
  * Densidees.py, le code du programme
  * ManuelDensidees.pdf, le manuel d'utilisateur, qui explique comment utiliser Densidées
 
+Si vous voulez utiliser TreeTagger depuis le logiciel Densidées, il faudra également installer :
+ * TreeTagger
+ * Perl (par exemple sous Windows installer Strawberry Perl http://strawberryperl.com, puis redémarrer l'ordinateur)
+
 
 == Citation ==
 
 Bien que Densidées soit un logiciel libre sous licence GPL, nous aimerions que vous fassiez référence à l'article suivant si vous l'utilisez dans une publication :
- * Hye Ran Lee, Philippe Gambette et Melissa Barkat-Defradas. Utilisation de l'analyse textuelle automatique dans la recherche sur la maladie d'Alzheimer. Poster au _Colloque international des jeunes chercheurs en Didactique des Langues et en Linguistique_ ([http://w3.u-grenoble3.fr/lidilem/colloque-ec/cedil2010/ CEDIL2010], [http://www.lirmm.fr/~gambette/2009LeeGambette.pdf résumé ici]).
+ * Hyeran Lee, Philippe Gambette, Constance Thuillier et Elsa Maillé. [http://halshs.archives-ouvertes.fr/halshs-00495768/fr/ Densidées : calcul automatique de la densité des idées dans un corpus oral]. RECITAL 2010.
 
 
 == Versions ==
+
+Version 1.3 (2010/06/30) :
+ * appel automatique de TreeTagger depuis Densidées
+ * mode "invisible" permettant de n'afficher que le résultat, en ligne de commande
+ * calcul de la densité des idées comme ratio pour 10 mots selon la formule traditionnelle
+ * amélioration des règles 208 et 701
 
 Version 1.2 (2010/03/07) :
  * prétraitement des auxiliaires si pas fait par TreeTagger
@@ -40,3 +55,4 @@ Version 1.1 (2009/12/12) :
 Version 1.0 (2009/11/21) :
  * texte étiqueté par TreeTagger en entrée du programme
  * 7 règles : 002, 003, 200, 201, 301, 302, 402
+

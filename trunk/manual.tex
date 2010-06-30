@@ -80,8 +80,9 @@ version \VERSION ~- \dateversion}
 \NoAutoSpaceBeforeFDP
 \Densidees ~calcule la densité des idées d'un texte
 (au sens de \cite{Kintsch1974} et \cite{TurnerGreene1977},
-c'est à dire le nombre de prédicats divisé par le nombre
-total de mots).
+c'est à dire le nombre moyen d'idées exprimées en 10 mots),
+utile en particulier pour l'analyse des discours
+de patients atteint de la maladie d'Alzheimer.
 Il adapte à la langue française le calcul implémenté
 pour la langue anglaise dans le logiciel CPIDR~\cite{BSKHC2008}.
 
@@ -102,9 +103,9 @@ commande (son utilisation est détaillée en section~\ref{lignecommande}).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\mysection{Installation du programme}
+\mysection{Installation du programme}\label{installation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\Densidees est écrit en Python (version 2.6), il faut donc
+\Densidees ~est écrit en Python (version 2.6), il faut donc
 commencer par télécharger Python sur
 \url{http://www.python.org/download/releases/2.6/}
 et l'installer (par exemple sous Windows dans \texttt{C:\textbackslash Python26}).
@@ -125,6 +126,23 @@ texte voulu et de cliquer pour obtenir le résultat,
 en Python, que vous pouvez lancer directement depuis la ligne
 de commande, et appeler automatiquement dans des scripts pour
 calculer la densité des idées d'un ensemble de plusieurs fichiers.
+\end{itemize}
+
+Depuis sa version 1.3, \Densidees ~permet de charger directement
+un texte, et d'effectuer son étiquetage grammatical en faisant
+appel à TreeTagger par un clic sur le bouton \emph{Taguer !} : ceci
+nécessite l'installation de :
+\begin{itemize}
+\item TreeTagger : télécharger le programme sur
+\url{ftp://ftp.ims.uni-stuttgart.de/pub/corpora/tree-tagger-windows-3.2.zip}
+et le décompresser sur le disque dur, par exemple dans \texttt{C:\textbackslash TreeTagger}.
+Télécharger le fichier de paramètres français \url{ftp://ftp.ims.uni-stuttgart.de/pub/corpora/french-par-linux-3.2.bin.gz}
+et décompresser le fichier \texttt{french-par-linux-3.2.bin}
+qu'il contient dans le dossier \texttt{lib} de TreeTagger
+(par exemple \texttt{C:\textbackslash TreeTagger\textbackslash lib}).
+Renommer ce fichier en \texttt{french.par}. Il faudra alors indiquer l'adresse
+\texttt{C:\textbackslash TreeTagger} dans \Densidees .
+\item Perl : pour Windows, télécharger et installer Strawberry Perl (\url{http://strawberryperl.com}) par exemple.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -155,18 +173,31 @@ avec \Densidees , on pourra omettre de transcrire les parties entre crochets pou
 
 \subsection{Avec l'interface graphique sous Windows}
 
-La première étape est d'étiqueter le texte avec TreeTagger.
-Pour des textes de moins de 1000 mots, ceci est possible
-par exemple avec l'interface web disponible à l'adresse
-\url{http://www.cele.nottingham.ac.uk/~ccztk/treetagger.php}.
-Attention, cette interface n'étiquette pas correctement les textes
-avec des retours à la ligne (le dernier mot avant le retour à la ligne
-est supprimé ou bien son étiquetage est placé sur deux lignes). Il
-faudra donc supprimer les retours à la ligne ou bien vérifier
-l'étiquetage à ces endroits.
+Pour lancer \Densidees ~sous Windows, il faut double-cliquer
+sur le programme \texttt{Densidees.exe} :
+la fenêtre montrée en figure ~\ref{FigGUI} apparaît alors.
 
-Quand vous double-cliquez sur le programme \texttt{Densidees.exe},
-la fenêtre montrée en figure ~\ref{FigGUI} apparaît.
+La première étape est d'étiqueter le texte avec TreeTagger.
+Une première possibilité, si vous
+avez installé le logiciel sur votre machine comme expliqué en section~\ref{installation},
+est de coller (ou ouvrir) le texte que vous voulez étiqueter dans le cadre de gauche
+de \Densidees , puis de cliquer sur le bouton \emph{Taguer !}, après avoir
+pris soin de renseigner correctement l'adresse du dossier contenant TreeTagger.
+
+Si vous n'avez pas installé TreeTagger, vous pouvez utiliser
+l'interface web disponible à l'adresse
+\url{http://cental.fltr.ucl.ac.be/treetagger/}.
+\textbf{Attention !} Avec cette interface, utilisez bien un clic droit sur le
+lien vers le résultat pour enregistrer le fichier sur votre machine.
+Si au contraire vous cliquez sur le lien pour afficher directement dans
+votre navigateur le texte étiqueté, il est possible que les accents
+n'apparaissent pas correctement, ce qui causera des erreurs de Densidées.
+%Attention, cette interface n'étiquette pas correctement les textes
+%avec des retours à la ligne (le dernier mot avant le retour à la ligne
+%est supprimé ou bien son étiquetage est placé sur deux lignes). Il
+%faudra donc supprimer les retours à la ligne ou bien vérifier
+%l'étiquetage à ces endroits.
+
 Après avoir collé le texte étiqueté par TreeTagger dans le cadre
 de gauche (ou bien ouvert un fichier TXT contenant un
 texte étiqueté par TreeTagger à l'aide du bouton \emph{Ouvrir le texte}),
@@ -223,6 +254,52 @@ activation du mode oral.
 }
 \label{FigCMD}
 \end{figure}
+
+\subsection{Sur plusieurs fichiers : le mode ``invisible''}
+
+Si vous voulez calculer la densité des idées de plusieurs fichiers,
+\Densidees ~vous permet, en ligne de commande, de n'afficher que les données suivantes,
+séparées par des point-virgules :
+\begin{itemize}
+\item nom de fichier
+\item nombre de mots
+\item nombre de propositions
+\end{itemize}
+Il faut pour cela utiliser l'option \texttt{visible=0} comme
+montré en figure~\ref{FigCMDinvisible}.
+\begin{figure}[ht] % b floats figure to bottom, p floats to next page, h = here
+\begin{center}
+\includegraphics[width=1.0\textwidth]{manualDensideesCMDinvisible.png}
+\end{center}
+\caption{\small \sffamily Utilisation du mode ``invisible'' de \Densidees ~en ligne de commande sous Windows.
+}
+\label{FigCMDinvisible}
+\end{figure}
+
+Cela vous permettra de construire très facilement un
+tableau de résultats, en enregistrant la sortie
+des fichiers dans un document au format CSV, que vous
+pourrez ensuite ouvrir dans le logiciel Excel.
+Pour cela, sous Windows, imaginons que nous voulons avoir dans
+un tableau Excel la densité des idées de trois textes \texttt{Texte1.txt}, 
+\texttt{Texte2.txt} et \texttt{Texte3.txt}. On crée
+un fichier texte contenant les 3 commandes suivantes :
+\tiny
+\begin{verbatim}
+"C:\Python26\python.exe" "C:\Densidees\Densidees.py" visible=0 "C:\Densidees\Texte1.txt" > C:\Densidees\resultats.csv
+"C:\Python26\python.exe" "C:\Densidees\Densidees.py" visible=0 "C:\Densidees\Texte2.txt" >> C:\Densidees\resultats.csv
+"C:\Python26\python.exe" "C:\Densidees\Densidees.py" visible=0 "C:\Densidees\Texte3.txt" >> C:\Densidees\resultats.csv
+\end{verbatim}
+\normalsize
+et on l'enregistre avec l'extension ``.bat'', par exemple
+dans \texttt{"C:\textbackslash Densidees\textbackslash script.bat"}. 
+En double cliquant dessus, les trois commandes sont exécutées.
+La première crée un fichier \texttt{resultats.csv} (ouvrable dans Excel)
+où elle indique son résultat sur la première ligne, les deux suivantes
+ajoutent leur résultat sur les lignes suivantes.
+Une formule Excel permettra de calculer la densité
+des idées à partir des valeurs de la deuxième et troisième colonne
+(nombre de mots et nombre de propositions).
 
 \subsection{Règles appliquées}
 
@@ -317,7 +394,7 @@ serviront donc à entourer des phrases incomplètes qui ne correspondent
 
 \subsection{Correspondances entre règles CPIDR et règles \Densidees}
 
-\small
+\scriptsize
 \begin{tabular}{|c|c|l|}
 \hline
 CPIDR & \Densidees & Commentaire\\
@@ -398,25 +475,21 @@ pour déterminer si le mot est une proposition.
 Bien que \Densidees ~soit un logiciel libre sous licence GPL,
 nous aimerions que vous fassiez référence à l'article suivant
 si vous l'utilisez dans une publication :
+
 Hyeran Lee, Philippe Gambette, Constance Thuillier \& Elsa Maillé.
 Densidées : calcul automatique de la densité des idées dans un corpus oral.
-Soumis à RECITAL 2010~\cite{LGTMB2010}.
+\emph{Actes de la douzième Rencontre des {\'E}tudiants Chercheurs
+en Informatique pour le Traitement Automatique des Langues (RECITAL 2010)},
+\url{http://halshs.archives-ouvertes.fr/halshs-00495768/fr/}, 2010~\cite{LGTMB2010}.
 
-L'article suivant montre le lien entre la densité des idées calculée par \Densidees ~et
+Le poster suivant montre le lien entre la densité des idées calculée par \Densidees ~et
 la maladie d'Alzheimer :
-Hye Ran Lee, Philippe Gambette \& Melissa Barkat-Defradas. Utilisation de l'analyse
+
+Hyeran Lee, Philippe Gambette \& Melissa Barkat-Defradas. Utilisation de l'analyse
 textuelle automatique dans la recherche sur la maladie d'Alzheimer.
 Poster au Colloque international des jeunes chercheurs
-en Didactique des Langues et en Linguistique (CEDIL 2010)~\cite{LGB2010}.
-
-
-
-%\Densidees is a collection of Python scripts which creates
-%the tree cloud visualization of a text, with a large choice of parameters.
-
-%It requires the program SplitsTree, freely available from
-%\href{http://www.splitstree.org}
-%{www.splitstree.org}, to compute the tree and draw the tree clouds.
+en Didactique des Langues et en Linguistique (CEDIL 2010),
+\url{http://www.lirmm.fr/\~gambette/2010LeeGambetteBarkatPoster.pdf}, 2010~\cite{LGB2010}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -448,6 +521,14 @@ along with \Densidees .  If not, see \url{http://www.gnu.org/licenses/}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \mysection{Historique des versions}\label{history}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+2010/06/30 1.3 :
+\begin{itemize}
+\item appel automatique de TreeTagger depuis Densidées
+\item mode ``invisible'' permettant de n'afficher que le résultat, en ligne de commande
+\item calcul de la densité des idées comme ratio pour 10 mots selon la formule traditionnelle
+\item amélioration des règles 208, 301 et 701
+\end{itemize}
 
 2010/03/07 1.2 :
 \begin{itemize}
@@ -482,6 +563,15 @@ Osidmesh\footnote{~\url{http://www.lirmm.fr/~semindoc/Osidmesh.html}}
 Elsa Maillé et Constance Thuillier ont également contribué à
 l'ajout de règles dans ce logiciel, ainsi qu'à son évaluation
 par l'étiquetage manuel de corpus de test.
+
+L'école doctorale I2S, l'ATALA, l'école doctorale 58 et le laboratoire Praxiling
+ont participé au financement de la participation d'Hyeran Lee au colloque
+RECITAL 2010 pour présenter le logiciel à la communauté francophone
+de traitement automatique du langage.
+
+Si vous vous demandez d'où provient l'icône de Densidées,
+allez voir sur cette page \url{http://philippe.gambette.free.fr/Photos/200907_Liban.htm},
+ou pensez à lever les yeux le jour où vous visiterez Beyrouth.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \printindex
