@@ -1,11 +1,11 @@
 #!/usr/sfw/bin/python
 # -*- coding: iso-8859-15 -*-
-#C:\Python26\Python.exe C:\These\2009Densidees\densidees\Densidees.py C:\These\2009Densidees\densidees\Test.txt
+#C:\Python38\Python.exe C:\These\2009Densidees\densidees\Densidees.py C:\These\2009Densidees\densidees\Test.txt
 
 #######################################################################
-# Copyright 2010 Philippe Gambette, Hye-Ran Lee
+# Copyright 2021 Philippe Gambette, Hye-Ran Lee
 # 
-# Densidees v1.3 (30/06/2010).
+# Densidees v1.4 (06/04/2021).
 #
 # Densidees is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,17 +45,17 @@ while i<len(sys.argv):
         i+=1
 
 # oral=1 si mode oral
-if not(args.has_key("oral")):
+if not("oral" in args):
         args["oral"]=0
 oral=int(args["oral"]);
 
 # visible=1 si mode oral
-if not(args.has_key("visible")):
+if not("visible" in args):
         args["visible"]=1
 visible=int(args["visible"]);
 
 # tag=treetagger par défaut
-if not(args.has_key("tag")):
+if not("tag" in args):
         args["tag"]="treetagger"
 tagger=args["tag"];
 
@@ -95,7 +95,7 @@ def openText(filename,tagger):
                                 #print item
                                 text.append(item)
                         else:
-                                print "Ligne",i,"non traitée :",line
+                                print("Ligne " + str(i) + " non traitee : " + line)
                                 item={}
                                 item["word"]=" "
                                 item["tag"]="INT"
@@ -120,7 +120,7 @@ def openText(filename,tagger):
                                 #print item
                                 text.append(item)
                         else:
-                                print "Ligne",i,"non traitée :",line
+                                print("Ligne " + str(i) + " non traitée : " + line)
         fd.close()
         return text
 
@@ -172,7 +172,7 @@ def isLink(lemma):
 
 if os.path.isfile(thefile):
         if visible == 1 :
-                print "Chargement du fichier texte..."
+                print("Chargement du fichier texte...")
         output = open(thefile+".di.txt","w")
 
         
@@ -763,13 +763,13 @@ if os.path.isfile(thefile):
                 tag=item["tag"]
                 while len(tag)<12:
                        tag=tag+" "
-                if bilanRegles.has_key(item["rule"]):
+                if item["rule"] in bilanRegles:
                        bilanRegles[item["rule"]]+=1
                 else:
                        bilanRegles[item["rule"]]=1
                 
                 output.writelines(item["rule"]+" "+tag+" "+item["isWord"]+" "+item["isProp"]+" "+item["word"]+"\n")
-                if visible==1:print item["rule"],tag,item["isWord"],item["isProp"],item["word"]
+                if visible==1:print(item["rule"] + " " + tag + " " + item["isWord"] + " " + item["isProp"] + " " + item["word"])
                 i+=1
 
         # Display final information
@@ -777,42 +777,39 @@ if os.path.isfile(thefile):
         output.writelines(str(nbProps)+" propositions.\n")
         output.writelines("Densité des idées : "+str(10*round((nbProps+0.00000001)/(nbWords+0.00000001),4))+"\n")
         if visible==1:
-                print nbWords,"mots."
-                print nbProps,"propositions."
-                print "Densite des idees :",round(10*(nbProps+0.00000001)/(nbWords+0.00000001),4)
+                print(str(nbWords) + " mots.")
+                print(str(nbProps) + " propositions.")
+                print("Densite des idees : " + str(round(10*(nbProps+0.00000001)/(nbWords+0.00000001),4)))
         else :
-                print thefile+";"+str(nbWords)+";"+str(nbProps)
-        numRegles=bilanRegles.keys();
+                print(thefile+";"+str(nbWords)+";"+str(nbProps))
+        numRegles=list(bilanRegles.keys());
         numRegles.sort()
         for item in numRegles:
-                output.writelines(str(bilanRegles[item])+" fois la règle "+item+"\n")
+                output.writelines(str(bilanRegles[item]) + " fois la règle " + item + "\n")
                 if visible==1:
-                        print (str(bilanRegles[item])+" fois la regle "+item)
+                        print(str(bilanRegles[item]) + " fois la regle " + item)
         output.close()
 else:
         if thefile=="help":
-                print ""
-                print "==== HELP ON DENSIDEES ===="
-                print "densidees [options] <filename>"
-                print ""
-                print "<filename> contains an output file from the French TreeTagger"
-                print "(or a CNR file output by Cordial if you use option tag=cordial)."
-                print "Use for example the online version of TreeTagger on"
-                print "http://www.cele.nottingham.ac.uk/~ccztk/treetagger.php"                
-                print ""
-                print "***OPTIONS:***"
-                print ""
-                print "oral=1: to activate speech mode."
-                print ""
-                print "visible=0: to activate invisible mode, i.e. the only thing"
-                print "  is the result of the computation: useful when computing"
-                print "  the idea density of a set of files."
-                print ""
-                print "tag=<tagger> where <tagger> is treetagger or cordial:"
-                print "  to choose the POS-tagger."
-                print "  !! the Cordial rules are in beta version"
+                print("""==== HELP ON DENSIDEES ====
+densidees [options] <filename>
+<filename> contains an output file from the French TreeTagger
+(or a CNR file output by Cordial if you use option tag=cordial).
+Use for example the online version of TreeTagger on
+http://www.cele.nottingham.ac.uk/~ccztk/treetagger.php
 
+***OPTIONS:***"
+
+oral=1: to activate speech mode.
+
+visible=0: to activate invisible mode, i.e. the only thing
+  is the result of the computation: useful when computing
+  the idea density of a set of files.
+
+tag=<tagger> where <tagger> is treetagger or cordial:
+  to choose the POS-tagger.
+  !! the Cordial rules are in beta version""")
         else:   
                 
-                print filename," - file does not exist!"
-                print "Please use option help to display the possible parameters."
+                print(filename + """ - file does not exist!
+Please use option help to display the possible parameters.""")
